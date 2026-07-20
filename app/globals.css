@@ -1,0 +1,252 @@
+:root {
+  --bg: #ffffff;
+  --surface: #f4f5f7;
+  --text: #16181d;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #4f46e5;
+  --accent-contrast: #ffffff;
+  --danger: #ef4444;
+
+  /* Висота нижньої навігації + запас під home-indicator */
+  --tabbar-height: 68px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #1a1d24;
+    --text: #f3f4f6;
+    --text-muted: #9ca3af;
+    --border: #2a2e37;
+    --accent: #6366f1;
+    --accent-contrast: #ffffff;
+    --danger: #f87171;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---- Каркас застосунку: одна колонка на всю ширину, mobile-first ---- */
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px calc(var(--tabbar-height) + var(--safe-bottom) + 20px);
+}
+
+.screen__title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 8px 0 4px;
+  letter-spacing: -0.02em;
+}
+
+.screen__subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin: 0 0 20px;
+}
+
+/* ---- Порожні стани для Inbox / Today ---- */
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  color: var(--text-muted);
+}
+
+.empty__icon {
+  font-size: 44px;
+}
+
+.empty__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.empty__text {
+  font-size: 15px;
+  max-width: 260px;
+  line-height: 1.4;
+}
+
+/* ---- Capture screen ---- */
+.capture {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.capture__input {
+  flex: 1;
+  width: 100%;
+  min-height: 200px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.4;
+  padding: 4px 0;
+}
+
+.capture__input::placeholder {
+  color: var(--text-muted);
+}
+
+.capture__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Велика кругла кнопка мікрофона під палець */
+.mic {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+  transition: transform 0.08s ease;
+}
+
+.mic:active {
+  transform: scale(0.94);
+}
+
+.mic__hint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ---- Список задач ---- */
+.task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  min-height: 60px;
+}
+
+.task__check {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.task__check--done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.task__title {
+  flex: 1;
+  font-size: 17px;
+}
+
+.task__title--done {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* ---- Нижня таб-навігація ---- */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  max-width: 640px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding-bottom: var(--safe-bottom);
+}
+
+.tabbar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: var(--tabbar-height);
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.tabbar__item--active {
+  color: var(--accent);
+}
+
+.tabbar__icon {
+  font-size: 24px;
+  line-height: 1;
+}
