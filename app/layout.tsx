@@ -3,9 +3,9 @@ import "./globals.css";
 import TabBar from "@/components/TabBar";
 
 export const metadata: Metadata = {
-  title: "AI-планер дня",
+  title: "AI Day Planner",
   description:
-    "Продиктуй або запиши все, що в голові — AI перетворить це на структуровані задачі.",
+    "Dump everything on your mind by voice or text — AI turns it into structured tasks.",
 };
 
 // Mobile-first: фіксований масштаб, підтримка вирізів екрана.
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="uk">
+    <html lang="en">
       <body>
         <div className="app">
           {children}

@@ -10,16 +10,16 @@ type Tab = {
 };
 
 const TABS: Tab[] = [
-  { href: "/capture", label: "Захопити", icon: "✍️" },
-  { href: "/inbox", label: "Вхідні", icon: "📥" },
-  { href: "/today", label: "Сьогодні", icon: "✅" },
+  { href: "/capture", label: "Capture", icon: "✍️" },
+  { href: "/inbox", label: "Inbox", icon: "📥" },
+  { href: "/today", label: "Today", icon: "✅" },
 ];
 
 export default function TabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="tabbar" aria-label="Головна навігація">
+    <nav className="tabbar" aria-label="Main navigation">
       {TABS.map((tab) => {
         const active = pathname === tab.href;
         return (

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTasks } from "@/lib/useTasks";
 
 export default function InboxPage() {
@@ -7,18 +8,21 @@ export default function InboxPage() {
 
   return (
     <main className="screen">
-      <h1 className="screen__title">Вхідні</h1>
-      <p className="screen__subtitle">Розпарсені задачі, які ще не заплановані</p>
+      <h1 className="screen__title">Inbox</h1>
+      <p className="screen__subtitle">Parsed tasks that aren&apos;t scheduled yet</p>
 
       {loaded && inbox.length === 0 ? (
         <div className="empty">
           <span className="empty__icon" aria-hidden>
             📥
           </span>
-          <span className="empty__title">Поки порожньо</span>
+          <span className="empty__title">Nothing here yet</span>
           <span className="empty__text">
-            Захопи думки на екрані «Захопити» — розпарсені задачі зʼявляться тут.
+            Dump your thoughts on the Capture screen — parsed tasks will land here.
           </span>
+          <Link href="/capture" className="cta">
+            ✍️ Capture something
+          </Link>
         </div>
       ) : (
         <ul className="task-list">
@@ -28,7 +32,7 @@ export default function InboxPage() {
                 type="button"
                 className="task__check"
                 onClick={() => toggleDone(task.id)}
-                aria-label="Позначити виконаною"
+                aria-label="Mark as done"
               />
               <span className="task__title">{task.title}</span>
             </li>

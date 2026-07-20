@@ -108,6 +108,26 @@ button {
   line-height: 1.4;
 }
 
+/* CTA у порожньому стані — щоб екран не виглядав як баг (онбординг) */
+.cta {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cta:active {
+  opacity: 0.85;
+}
+
 /* ---- Capture screen ---- */
 .capture {
   flex: 1;
