@@ -41,11 +41,16 @@ function systemPrompt(today: string): string {
 
 For every distinct actionable item in the dump, output a task:
 - title: a short, clear imperative (e.g. "Call mom", "Finish the deck"). Clean it up; drop filler.
-- priority: "low" | "medium" | "high", inferred from urgency and importance.
+- priority: "low" | "medium" | "high" — see the prioritization principle below.
 - estimateMin: a rough time estimate in whole minutes, or null if you truly can't tell.
-- deadline: an ISO date "YYYY-MM-DD" if the text implies one (resolve "tomorrow", "Friday", "next week" relative to today), else null.
+- deadline: an ISO date "YYYY-MM-DD" ONLY if the text implies one (resolve "tomorrow", "Friday", "next week" relative to today). If no date is stated or implied, use null — NEVER invent a deadline.
 - isToday: true only if the item is explicitly for today or clearly urgent/now.
-- suggested: mark true for at most THREE items that are NOT already isToday — the ones you'd recommend doing today (quick wins or high impact). Everything else: false.
+- suggested: mark true for at most THREE items that are NOT already isToday — see the tiebreaker below. Everything else: false.
+
+PRIORITIZATION PRINCIPLE (apply in this order):
+1. IMPORTANCE is the backbone — infer it from the text even when no date is given. Signals of higher importance: real consequences or stakes if not done; someone else is affected or waiting (a client, boss, family) rather than only the user; it blocks other work; money, health, or commitments are involved. "Finish the client deck" outranks "maybe look into a gym".
+2. URGENCY is only a booster — if a real deadline is near, bump priority up. Never let missing dates lower importance, and never fabricate urgency the text doesn't support.
+3. EFFORT is the tiebreaker for 'suggested' — among important tasks, prefer quick wins (low estimateMin) to build momentum. Pick the 3 suggested this way.
 
 Ignore vague musings that aren't tasks. If the dump contains no real tasks, return an empty array.`;
 }
