@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 import { useTasks } from "@/lib/useTasks";
+import type { Task } from "@/lib/types";
+
+function meta(task: Task): string {
+  const parts: string[] = [];
+  if (task.estimateMin != null) parts.push(`${task.estimateMin} min`);
+  if (task.deadline) parts.push(`due ${task.deadline}`);
+  return parts.join(" · ");
+}
 
 export default function InboxPage() {
-  const { inbox, loaded, toggleDone } = useTasks();
+  const { inbox, loaded, acceptSuggestion, toggleDone } = useTasks();
 
   return (
     <main className="screen">
@@ -27,14 +35,38 @@ export default function InboxPage() {
       ) : (
         <ul className="task-list">
           {inbox.map((task) => (
-            <li key={task.id} className="task">
+            <li
+              key={task.id}
+              className={`task${task.suggested ? " task--suggested" : ""}`}
+            >
               <button
                 type="button"
                 className="task__check"
                 onClick={() => toggleDone(task.id)}
                 aria-label="Mark as done"
               />
-              <span className="task__title">{task.title}</span>
+              <div className="task__body">
+                <span className="task__title">{task.title}</span>
+                <span className="task__meta">
+                  <span className={`prio prio--${task.priority}`}>
+                    {task.priority}
+                  </span>
+                  {meta(task) && <span>{meta(task)}</span>}
+                  {task.suggested && (
+                    <span className="badge">✨ Suggested for today</span>
+                  )}
+                </span>
+              </div>
+              {task.suggested && (
+                <button
+                  type="button"
+                  className="task__add"
+                  onClick={() => acceptSuggestion(task.id)}
+                  aria-label="Add to Today"
+                >
+                  + Today
+                </button>
+              )}
             </li>
           ))}
         </ul>

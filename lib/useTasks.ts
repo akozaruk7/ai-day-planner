@@ -1,31 +1,50 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { Task } from "./types";
+import type { ParsedTask, Task } from "./types";
 
 const TASKS_KEY = "ai-planner:tasks";
 
+function todayISO(): string {
+  // Локальна дата у форматі YYYY-MM-DD (для порівняння з дедлайнами).
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
+// Правило (не AI): що одразу потрапляє в Today.
+function statusFor(t: ParsedTask): Task["status"] {
+  const isDueToday = t.deadline !== null && t.deadline <= todayISO();
+  return t.isToday || isDueToday ? "today" : "inbox";
+}
+
+function newId(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `t_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+  }
+}
+
 /**
  * Клієнтський стан задач із persist у localStorage.
- * Бекенду немає — це єдине джерело правди для каркаса.
- * Поки що AI-парсингу немає, тому список задач стартує порожнім.
+ * Єдине джерело правди — бекенду немає.
  */
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  // Гідратуємо стан з localStorage лише на клієнті.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(TASKS_KEY);
       if (raw) setTasks(JSON.parse(raw) as Task[]);
     } catch {
-      // пошкоджені дані ігноруємо — стартуємо з порожнього списку
+      // пошкоджені дані — стартуємо з порожнього списку
     }
     setLoaded(true);
   }, []);
 
-  // Пишемо назад у localStorage після кожної зміни (тільки після гідратації).
   useEffect(() => {
     if (!loaded) return;
     try {
@@ -34,6 +53,26 @@ export function useTasks() {
       // квота/приватний режим — тихо ігноруємо
     }
   }, [tasks, loaded]);
+
+  // Додати розпарсені AI-задачі (застосовуємо правило статусу тут, у коді).
+  const addParsed = useCallback((parsed: ParsedTask[]) => {
+    const now = Date.now();
+    const mapped: Task[] = parsed.map((p, i) => {
+      const status = statusFor(p);
+      return {
+        id: newId(),
+        title: p.title,
+        priority: p.priority,
+        estimateMin: p.estimateMin,
+        deadline: p.deadline,
+        status,
+        // suggested має сенс лише для тих, що лишились у Inbox
+        suggested: status === "inbox" && p.suggested,
+        createdAt: now + i,
+      };
+    });
+    setTasks((prev) => [...mapped, ...prev]);
+  }, []);
 
   const toggleDone = useCallback((id: string) => {
     setTasks((prev) =>
@@ -45,26 +84,39 @@ export function useTasks() {
     );
   }, []);
 
+  // Прийняти рекомендацію: перенести задачу з Inbox у Today одним тапом.
+  const acceptSuggestion = useCallback((id: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, status: "today", suggested: false } : t
+      )
+    );
+  }, []);
+
   const removeTask = useCallback((id: string) => {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
+  const todayList = tasks.filter(
+    (t) => t.status === "today" || t.status === "done"
+  );
 
   return {
     tasks,
     loaded,
     inbox: tasks.filter((t) => t.status === "inbox"),
-    today: tasks.filter((t) => t.status === "today" || t.status === "done"),
+    today: todayList,
+    doneCount: todayList.filter((t) => t.status === "done").length,
+    addParsed,
     toggleDone,
+    acceptSuggestion,
     removeTask,
   };
 }
 
 const DRAFT_KEY = "ai-planner:capture-draft";
 
-/**
- * Persist чернетки поля «Що в голові?», щоб текст не губився між перезаходами.
- * Наочно демонструє зв'язку React state ↔ localStorage без бекенду.
- */
+/** Persist чернетки поля «What's on your mind?» між перезаходами. */
 export function useCaptureDraft() {
   const [draft, setDraft] = useState("");
   const [loaded, setLoaded] = useState(false);

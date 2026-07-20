@@ -1,10 +1,19 @@
 # AI-планер дня
 
-Mobile-first to-do застосунок: користувач диктує або пише все, що в голові, а AI
+Mobile-first to-do застосунок: користувач пише все, що в голові, а AI
 перетворює це на структуровані задачі.
 
-> Це **каркас** (крок 1): 3 екрани + нижня таб-навігація. AI-парсинг ще не
-> підключено. Стан тримається на клієнті (React state + `localStorage`), бекенду немає.
+> Стан тримається на клієнті (React state + `localStorage`). Єдиний серверний
+> шматок — ендпоінт `/api/parse`, який викликає Claude (щоб не світити ключ у браузері).
+
+## AI-парсинг
+
+- Ендпоінт: [app/api/parse/route.ts](app/api/parse/route.ts) — виклик **Claude Haiku 4.5**,
+  структурований вивід через tool-use.
+- Потрібна змінна оточення **`ANTHROPIC_API_KEY`** (див. `.env.local.example`).
+  Локально — у `.env.local`; на Vercel — у Project → Settings → Environment Variables.
+- За один виклик AI: парсить дамп на задачі, збагачує (`priority`, `estimateMin`,
+  `deadline`), мітить `isToday` та до 3 `suggested`. Розподіл по Today/Inbox — правило в коді.
 
 ## Екрани
 
