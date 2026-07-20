@@ -12,7 +12,7 @@ function meta(task: Task): string {
 }
 
 export default function InboxPage() {
-  const { inbox, loaded, acceptSuggestion, toggleDone } = useTasks();
+  const { inbox, loaded, moveToToday, toggleDone } = useTasks();
 
   return (
     <main className="screen">
@@ -57,16 +57,14 @@ export default function InboxPage() {
                   )}
                 </span>
               </div>
-              {task.suggested && (
-                <button
-                  type="button"
-                  className="task__add"
-                  onClick={() => acceptSuggestion(task.id)}
-                  aria-label="Add to Today"
-                >
-                  + Today
-                </button>
-              )}
+              <button
+                type="button"
+                className="task__add"
+                onClick={() => moveToToday(task.id)}
+                aria-label="Add to Today"
+              >
+                + Today
+              </button>
             </li>
           ))}
         </ul>

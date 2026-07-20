@@ -384,6 +384,23 @@ button {
   opacity: 0.85;
 }
 
+/* Відкласти задачу з Today назад у Inbox */
+.task__defer {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.task__defer:active {
+  background: var(--surface);
+}
+
 .task__title--done {
   color: var(--text-muted);
   text-decoration: line-through;

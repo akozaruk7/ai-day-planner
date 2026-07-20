@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useTasks } from "@/lib/useTasks";
 
 export default function TodayPage() {
-  const { today, doneCount, loaded, toggleDone } = useTasks();
+  const { today, doneCount, loaded, toggleDone, moveToInbox } = useTasks();
 
   const total = today.length;
   const allDone = total > 0 && doneCount === total;
@@ -78,6 +78,17 @@ export default function TodayPage() {
                   >
                     {task.title}
                   </span>
+                  {!done && (
+                    <button
+                      type="button"
+                      className="task__defer"
+                      onClick={() => moveToInbox(task.id)}
+                      aria-label="Defer to Inbox"
+                      title="Move back to Inbox"
+                    >
+                      ↩
+                    </button>
+                  )}
                 </li>
               );
             })}

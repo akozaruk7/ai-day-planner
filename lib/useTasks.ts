@@ -84,11 +84,20 @@ export function useTasks() {
     );
   }, []);
 
-  // Прийняти рекомендацію: перенести задачу з Inbox у Today одним тапом.
-  const acceptSuggestion = useCallback((id: string) => {
+  // Перенести будь-яку задачу в Today одним тапом (і зняти бейдж suggested).
+  const moveToToday = useCallback((id: string) => {
     setTasks((prev) =>
       prev.map((t) =>
         t.id === id ? { ...t, status: "today", suggested: false } : t
+      )
+    );
+  }, []);
+
+  // Відкласти: повернути задачу з Today назад у Inbox.
+  const moveToInbox = useCallback((id: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, status: "inbox" } : t
       )
     );
   }, []);
@@ -109,7 +118,8 @@ export function useTasks() {
     doneCount: todayList.filter((t) => t.status === "done").length,
     addParsed,
     toggleDone,
-    acceptSuggestion,
+    moveToToday,
+    moveToInbox,
     removeTask,
   };
 }
