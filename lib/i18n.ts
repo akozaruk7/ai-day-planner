@@ -31,7 +31,11 @@ export interface Strings {
     celebrateTitle: string;
   };
   prio: Record<Priority, string>;
-  meta: { min: (n: number) => string; due: (d: string) => string };
+  meta: {
+    min: (n: number) => string;
+    due: (d: string) => string;
+    setTime: string;
+  };
   progress: (done: number, total: number) => string;
   celebrateText: (n: number) => string;
 }
@@ -67,7 +71,7 @@ const uk: Strings = {
     celebrateTitle: "Ти закрив усі задачі на сьогодні!",
   },
   prio: { low: "низький", medium: "середній", high: "високий" },
-  meta: { min: (n) => `${n} хв`, due: (d) => `до ${d}` },
+  meta: { min: (n) => `${n} хв`, due: (d) => `до ${d}`, setTime: "⏱ час?" },
   progress: (done, total) => `${done} / ${total} виконано`,
   celebrateText: (n) => `${n} ${n === 1 ? "задача" : "задач"} виконано сьогодні. Красуня!`,
 };
@@ -103,7 +107,7 @@ const en: Strings = {
     celebrateTitle: "You hit all your tasks for today!",
   },
   prio: { low: "low", medium: "medium", high: "high" },
-  meta: { min: (n) => `${n} min`, due: (d) => `due ${d}` },
+  meta: { min: (n) => `${n} min`, due: (d) => `due ${d}`, setTime: "⏱ time?" },
   progress: (done, total) => `${done} / ${total} done`,
   celebrateText: (n) => `${n} ${n === 1 ? "task" : "tasks"} done today. Nice work.`,
 };

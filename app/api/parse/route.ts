@@ -44,7 +44,7 @@ Write every task "title" in ${outputLang}, regardless of the language of the dum
 For every distinct actionable item in the dump, output a task:
 - title: a short, clear imperative (e.g. "Call mom", "Finish the deck"). Clean it up; drop filler.
 - priority: "low" | "medium" | "high" — see the prioritization principle below.
-- estimateMin: a rough time estimate in whole minutes, or null if you truly can't tell.
+- estimateMin: a rough time estimate as ONE of these buckets of minutes: 5, 15, 30, 60, 120. Pick the closest bucket from the task's type and complexity (a quick message/call ~5–15, a focused task ~30–60, something big or vague ~120). Use null only if you genuinely cannot tell.
 - deadline: an ISO date "YYYY-MM-DD" ONLY if the text implies one (resolve "tomorrow", "Friday", "next week" relative to today). If no date is stated or implied, use null — NEVER invent a deadline.
 - isToday: true only if the item is explicitly for today or clearly urgent/now.
 - suggested: mark true for at most THREE items that are NOT already isToday — see the tiebreaker below. Everything else: false.

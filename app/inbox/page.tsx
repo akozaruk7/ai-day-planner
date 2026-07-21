@@ -3,18 +3,9 @@
 import Link from "next/link";
 import { useTasks } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
-import type { Task } from "@/lib/types";
-import type { Strings } from "@/lib/i18n";
-
-function meta(task: Task, t: Strings): string {
-  const parts: string[] = [];
-  if (task.estimateMin != null) parts.push(t.meta.min(task.estimateMin));
-  if (task.deadline) parts.push(t.meta.due(task.deadline));
-  return parts.join(" · ");
-}
 
 export default function InboxPage() {
-  const { inbox, loaded, moveToToday, toggleDone } = useTasks();
+  const { inbox, loaded, moveToToday, toggleDone, cycleEstimate } = useTasks();
   const { t } = useLang();
 
   return (
@@ -52,7 +43,17 @@ export default function InboxPage() {
                   <span className={`prio prio--${task.priority}`}>
                     {t.prio[task.priority]}
                   </span>
-                  {meta(task, t) && <span>{meta(task, t)}</span>}
+                  <button
+                    type="button"
+                    className="chip-edit"
+                    onClick={() => cycleEstimate(task.id)}
+                    aria-label="Edit time estimate"
+                  >
+                    {task.estimateMin != null
+                      ? t.meta.min(task.estimateMin)
+                      : t.meta.setTime}
+                  </button>
+                  {task.deadline && <span>{t.meta.due(task.deadline)}</span>}
                   {task.suggested && <span className="badge">{t.inbox.badge}</span>}
                 </span>
               </div>

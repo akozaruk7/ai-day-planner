@@ -102,6 +102,19 @@ export function useTasks() {
     );
   }, []);
 
+  // Тап по естімейту циклює кошики: null → 5 → 15 → 30 → 60 → 120 → null.
+  const cycleEstimate = useCallback((id: string) => {
+    const buckets: (number | null)[] = [null, 5, 15, 30, 60, 120];
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== id) return t;
+        const i = buckets.indexOf(t.estimateMin);
+        const next = buckets[(i + 1) % buckets.length];
+        return { ...t, estimateMin: next };
+      })
+    );
+  }, []);
+
   const removeTask = useCallback((id: string) => {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
@@ -120,6 +133,7 @@ export function useTasks() {
     toggleDone,
     moveToToday,
     moveToInbox,
+    cycleEstimate,
     removeTask,
   };
 }
