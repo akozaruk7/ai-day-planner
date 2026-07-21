@@ -13,10 +13,20 @@ function todayISO(): string {
   return `${d.getFullYear()}-${m}-${day}`;
 }
 
+// Валідна ISO-дата YYYY-MM-DD (модель інколи повертає "" замість null).
+function isISODate(d: unknown): d is string {
+  return typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
+}
+
+// Нормалізуємо дедлайн: усе, що не справжня дата (""/сміття) → null.
+function normalizeDeadline(d: unknown): string | null {
+  return isISODate(d) ? d : null;
+}
+
 // Правило (не AI): що одразу потрапляє в Today.
-function statusFor(t: ParsedTask): Task["status"] {
-  const isDueToday = t.deadline !== null && t.deadline <= todayISO();
-  return t.isToday || isDueToday ? "today" : "inbox";
+function statusFor(deadline: string | null, isToday: boolean): Task["status"] {
+  const isDueToday = deadline !== null && deadline <= todayISO();
+  return isToday || isDueToday ? "today" : "inbox";
 }
 
 function newId(): string {
@@ -58,13 +68,14 @@ export function useTasks() {
   const addParsed = useCallback((parsed: ParsedTask[]) => {
     const now = Date.now();
     const mapped: Task[] = parsed.map((p, i) => {
-      const status = statusFor(p);
+      const deadline = normalizeDeadline(p.deadline);
+      const status = statusFor(deadline, p.isToday === true);
       return {
         id: newId(),
         title: p.title,
         priority: p.priority,
-        estimateMin: p.estimateMin,
-        deadline: p.deadline,
+        estimateMin: typeof p.estimateMin === "number" ? p.estimateMin : null,
+        deadline,
         status,
         // suggested має сенс лише для тих, що лишились у Inbox
         suggested: status === "inbox" && p.suggested,
