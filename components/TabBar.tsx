@@ -2,25 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-type Tab = {
-  href: string;
-  label: string;
-  icon: string;
-};
-
-const TABS: Tab[] = [
-  { href: "/capture", label: "Capture", icon: "✍️" },
-  { href: "/inbox", label: "Inbox", icon: "📥" },
-  { href: "/today", label: "Today", icon: "✅" },
-];
+import { useLang } from "@/lib/LanguageContext";
 
 export default function TabBar() {
   const pathname = usePathname();
+  const { t } = useLang();
+
+  const tabs = [
+    { href: "/capture", label: t.tab.capture, icon: "✍️" },
+    { href: "/inbox", label: t.tab.inbox, icon: "📥" },
+    { href: "/today", label: t.tab.today, icon: "✅" },
+  ];
 
   return (
     <nav className="tabbar" aria-label="Main navigation">
-      {TABS.map((tab) => {
+      {tabs.map((tab) => {
         const active = pathname === tab.href;
         return (
           <Link

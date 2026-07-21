@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useTasks } from "@/lib/useTasks";
+import { useLang } from "@/lib/LanguageContext";
 
 export default function TodayPage() {
   const { today, doneCount, loaded, toggleDone, moveToInbox } = useTasks();
+  const { t } = useLang();
 
   const total = today.length;
   const allDone = total > 0 && doneCount === total;
@@ -12,8 +14,8 @@ export default function TodayPage() {
 
   return (
     <main className="screen">
-      <h1 className="screen__title">Today</h1>
-      <p className="screen__subtitle">Your checklist for today</p>
+      <h1 className="screen__title">{t.today.title}</h1>
+      <p className="screen__subtitle">{t.today.subtitle}</p>
 
       {/* 3 стани: порожньо (онбординг) → в роботі (прогрес) → все виконано (перемога) */}
       {loaded && total === 0 ? (
@@ -21,13 +23,10 @@ export default function TodayPage() {
           <span className="empty__icon" aria-hidden>
             👋
           </span>
-          <span className="empty__title">Let&apos;s plan your day</span>
-          <span className="empty__text">
-            Nothing scheduled yet. Dump what&apos;s on your mind and your tasks for
-            today will show up here as a checklist.
-          </span>
+          <span className="empty__title">{t.today.emptyTitle}</span>
+          <span className="empty__text">{t.today.emptyText}</span>
           <Link href="/capture" className="cta">
-            ✍️ Start capturing
+            {t.today.cta}
           </Link>
         </div>
       ) : (
@@ -35,13 +34,10 @@ export default function TodayPage() {
           {total > 0 && (
             <div className="progress">
               <div className="progress__bar">
-                <div
-                  className="progress__fill"
-                  style={{ width: `${pct}%` }}
-                />
+                <div className="progress__fill" style={{ width: `${pct}%` }} />
               </div>
               <span className="progress__label">
-                {doneCount} / {total} done
+                {t.progress(doneCount, total)}
               </span>
             </div>
           )}
@@ -51,12 +47,8 @@ export default function TodayPage() {
               <span className="celebrate__icon" aria-hidden>
                 🎉
               </span>
-              <span className="celebrate__title">
-                You hit all your tasks for today!
-              </span>
-              <span className="celebrate__text">
-                {total} {total === 1 ? "task" : "tasks"} done today. Nice work.
-              </span>
+              <span className="celebrate__title">{t.today.celebrateTitle}</span>
+              <span className="celebrate__text">{t.celebrateText(total)}</span>
             </div>
           )}
 
@@ -69,7 +61,7 @@ export default function TodayPage() {
                     type="button"
                     className={`task__check${done ? " task__check--done" : ""}`}
                     onClick={() => toggleDone(task.id)}
-                    aria-label={done ? "Mark as not done" : "Mark as done"}
+                    aria-label="Toggle done"
                   >
                     {done ? "✓" : ""}
                   </button>
@@ -84,7 +76,6 @@ export default function TodayPage() {
                       className="task__defer"
                       onClick={() => moveToInbox(task.id)}
                       aria-label="Defer to Inbox"
-                      title="Move back to Inbox"
                     >
                       ↩
                     </button>

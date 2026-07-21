@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import TabBar from "@/components/TabBar";
+import LangToggle from "@/components/LangToggle";
+import { LanguageProvider } from "@/lib/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "AI Day Planner",
+  title: "AI-планер дня",
   description:
-    "Dump everything on your mind by voice or text — AI turns it into structured tasks.",
+    "Вивали все, що в голові, голосом або текстом — AI перетворить це на структуровані задачі.",
 };
 
 // Mobile-first: фіксований масштаб, підтримка вирізів екрана.
@@ -23,12 +25,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="uk">
       <body>
-        <div className="app">
-          {children}
-          <TabBar />
-        </div>
+        <LanguageProvider>
+          <div className="app">
+            <header className="topbar">
+              <LangToggle />
+            </header>
+            {children}
+            <TabBar />
+          </div>
+        </LanguageProvider>
       </body>
     </html>
   );

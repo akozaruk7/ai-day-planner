@@ -64,7 +64,39 @@ button {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px 20px calc(var(--tabbar-height) + var(--safe-bottom) + 20px);
+  padding: 8px 20px calc(var(--tabbar-height) + var(--safe-bottom) + 20px);
+}
+
+/* Верхній бар із перемикачем мови */
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 20px 0;
+}
+
+.langtoggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.langtoggle__btn {
+  min-width: 44px;
+  min-height: 34px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.langtoggle__btn--on {
+  background: var(--accent);
+  color: var(--accent-contrast);
 }
 
 .screen__title {

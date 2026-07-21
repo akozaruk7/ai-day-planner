@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCaptureDraft, useTasks } from "@/lib/useTasks";
+import { useLang } from "@/lib/LanguageContext";
 import type { ParsedTask } from "@/lib/types";
 
 type Phase = "idle" | "loading" | "error";
@@ -10,6 +11,7 @@ type Phase = "idle" | "loading" | "error";
 export default function CapturePage() {
   const { draft, setDraft } = useCaptureDraft();
   const { addParsed } = useTasks();
+  const { t, lang } = useLang();
   const router = useRouter();
 
   const [phase, setPhase] = useState<Phase>("idle");
@@ -22,7 +24,7 @@ export default function CapturePage() {
       const res = await fetch("/api/parse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: draft }),
+        body: JSON.stringify({ text: draft, lang }),
       });
 
       if (!res.ok) throw new Error(`status ${res.status}`);
@@ -33,7 +35,7 @@ export default function CapturePage() {
       setPhase("idle");
       router.push("/inbox"); // ведемо туди, де зʼявилися задачі
     } catch {
-      // Edge-case #4: помилка AI/мережі — зрозуміле повідомлення, не білий екран.
+      // Edge-case: помилка AI/мережі — зрозуміле повідомлення, не білий екран.
       setPhase("error");
     }
   }
@@ -43,7 +45,7 @@ export default function CapturePage() {
       <div className="capture">
         <textarea
           className="capture__input"
-          placeholder="What's on your mind?"
+          placeholder={t.capture.placeholder}
           value={draft}
           onChange={(e) => {
             setDraft(e.target.value);
@@ -51,19 +53,19 @@ export default function CapturePage() {
           }}
           disabled={phase === "loading"}
           autoFocus
-          aria-label="What's on your mind?"
+          aria-label={t.capture.placeholder}
         />
 
         <div className="capture__actions">
           {phase === "error" && (
             <div className="banner banner--error" role="alert">
-              <span>Couldn&apos;t reach the AI. Check your connection and try again.</span>
+              <span>{t.capture.error}</span>
               <button
                 type="button"
                 className="banner__retry"
                 onClick={handleParse}
               >
-                Retry
+                {t.capture.retry}
               </button>
             </div>
           )}
@@ -74,12 +76,10 @@ export default function CapturePage() {
             onClick={handleParse}
             disabled={isEmpty || phase === "loading"}
           >
-            {phase === "loading" ? "Sorting into tasks…" : "✨ Sort into tasks"}
+            {phase === "loading" ? t.capture.sorting : t.capture.sort}
           </button>
           <span className="mic__hint">
-            {isEmpty
-              ? "Dump everything — AI turns it into structured tasks"
-              : "AI will split this into tasks with priority & deadlines"}
+            {isEmpty ? t.capture.hintEmpty : t.capture.hintFilled}
           </span>
         </div>
       </div>
