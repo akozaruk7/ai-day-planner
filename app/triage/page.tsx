@@ -55,7 +55,7 @@ export default function TriagePage() {
         {sorted.map((task) => (
           <li
             key={task.id}
-            className={`task${task.suggested ? " task--suggested" : ""}`}
+            className={`task task--${task.priority}${task.suggested ? " task--suggested" : ""}`}
           >
             <div className="task__body">
               <span className="task__title">{task.title}</span>

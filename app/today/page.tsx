@@ -211,7 +211,7 @@ export default function TodayPage() {
             {sortedToday.map((task) => {
               const done = task.status === "done";
               return (
-                <li key={task.id} className="task">
+                <li key={task.id} className={`task task--${task.priority}`}>
                   <button
                     type="button"
                     className={`task__check${done ? " task__check--done" : ""}`}
