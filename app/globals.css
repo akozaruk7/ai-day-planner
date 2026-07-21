@@ -222,6 +222,39 @@ button {
   text-align: center;
 }
 
+/* Кнопка голосового вводу */
+.mic-btn {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.mic-btn:active {
+  opacity: 0.85;
+}
+
+.mic-btn--on {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: var(--danger);
+  color: var(--danger);
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
 /* Банер помилки AI/мережі */
 .banner {
   width: 100%;

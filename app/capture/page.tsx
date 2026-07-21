@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCaptureDraft, useTasks } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
@@ -17,8 +18,67 @@ export default function CapturePage() {
   const [phase, setPhase] = useState<Phase>("idle");
   const isEmpty = draft.trim().length === 0;
 
+  // --- Голосовий ввід (браузерний Web Speech API) ---
+  const [micSupported, setMicSupported] = useState(false);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const baseTextRef = useRef("");
+
+  useEffect(() => {
+    // Fallback: якщо браузер не підтримує розпізнавання — просто не показуємо мікрофон.
+    const SR =
+      typeof window !== "undefined" &&
+      ((window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition);
+    setMicSupported(!!SR);
+    return () => {
+      try {
+        recognitionRef.current?.stop();
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
+
+  function toggleMic() {
+    if (!micSupported) return;
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    if (phase === "error") setPhase("idle");
+
+    const SR =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+    const rec = new SR();
+    rec.lang = lang === "uk" ? "uk-UA" : "en-US";
+    rec.continuous = true;
+    rec.interimResults = true;
+
+    baseTextRef.current = draft ? draft + " " : "";
+    rec.onresult = (e: any) => {
+      let transcript = "";
+      for (let i = 0; i < e.results.length; i++) {
+        transcript += e.results[i][0].transcript;
+      }
+      setDraft(baseTextRef.current + transcript);
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+
+    recognitionRef.current = rec;
+    try {
+      rec.start();
+      setListening(true);
+    } catch {
+      setListening(false);
+    }
+  }
+
   async function handleParse() {
     if (isEmpty || phase === "loading") return;
+    recognitionRef.current?.stop(); // зупиняємо диктування перед розбором
     setPhase("loading");
     try {
       const res = await fetch("/api/parse", {
@@ -31,11 +91,10 @@ export default function CapturePage() {
 
       const data = (await res.json()) as { tasks: ParsedTask[] };
       addParsed(data.tasks ?? []);
-      setDraft(""); // очищаємо поле після успішного розбору
+      setDraft("");
       setPhase("idle");
-      router.push("/today"); // одразу показуємо день
+      router.push("/today");
     } catch {
-      // Edge-case: помилка AI/мережі — зрозуміле повідомлення, не білий екран.
       setPhase("error");
     }
   }
@@ -68,6 +127,17 @@ export default function CapturePage() {
                 {t.capture.retry}
               </button>
             </div>
+          )}
+
+          {micSupported && (
+            <button
+              type="button"
+              className={`mic-btn${listening ? " mic-btn--on" : ""}`}
+              onClick={toggleMic}
+              disabled={phase === "loading"}
+            >
+              {listening ? t.capture.listening : t.capture.mic}
+            </button>
           )}
 
           <button

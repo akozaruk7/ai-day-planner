@@ -12,6 +12,8 @@ export interface Strings {
     hintFilled: string;
     error: string;
     retry: string;
+    mic: string;
+    listening: string;
   };
   inbox: {
     title: string;
@@ -76,6 +78,8 @@ const uk: Strings = {
     hintFilled: "AI розкладе це на задачі з пріоритетом і дедлайнами",
     error: "Не вдалося звʼязатися з AI. Перевір інтернет і спробуй ще раз.",
     retry: "Повторити",
+    mic: "🎤 Диктувати",
+    listening: "● Слухаю… (натисни, щоб зупинити)",
   },
   inbox: {
     title: "Вхідні",
@@ -151,6 +155,8 @@ const en: Strings = {
     hintFilled: "AI will split this into tasks with priority & deadlines",
     error: "Couldn't reach the AI. Check your connection and try again.",
     retry: "Retry",
+    mic: "🎤 Dictate",
+    listening: "● Listening… (tap to stop)",
   },
   inbox: {
     title: "Inbox",
