@@ -70,6 +70,12 @@ export interface Strings {
     empty: string;
     emptyText: string;
   };
+  triage: {
+    title: string;
+    subtitle: string;
+    add: string;
+    done: string;
+  };
 }
 
 const uk: Strings = {
@@ -156,6 +162,12 @@ const uk: Strings = {
     empty: "Історія порожня",
     emptyText: "Заверши день на «Сьогодні» — тут зʼявлятимуться підсумки.",
   },
+  triage: {
+    title: "Що на сьогодні?",
+    subtitle: "Обери, що робитимеш сьогодні — решта лишиться у Вхідних.",
+    add: "+ Сьогодні",
+    done: "Готово",
+  },
 };
 
 const en: Strings = {
@@ -241,6 +253,12 @@ const en: Strings = {
     link: "🗓 History",
     empty: "No history yet",
     emptyText: "End a day on Today — summaries will show up here.",
+  },
+  triage: {
+    title: "What's for today?",
+    subtitle: "Pick what you'll do today — the rest stays in Inbox.",
+    add: "+ Today",
+    done: "Done",
   },
 };
 

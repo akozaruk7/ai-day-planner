@@ -95,6 +95,8 @@ export function useTasks() {
       };
     });
     setTasks((prev) => [...mapped, ...prev]);
+    // Повертаємо id тих, що лишились у Вхідних — для екрана тріажу.
+    return mapped.filter((t) => t.status === "inbox").map((t) => t.id);
   }, []);
 
   const toggleDone = useCallback((id: string) => {

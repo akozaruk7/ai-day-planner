@@ -90,10 +90,23 @@ export default function CapturePage() {
       if (!res.ok) throw new Error(`status ${res.status}`);
 
       const data = (await res.json()) as { tasks: ParsedTask[] };
-      addParsed(data.tasks ?? []);
+      const inboxIds = addParsed(data.tasks ?? []);
       setDraft("");
       setPhase("idle");
-      router.push("/today");
+      if (inboxIds.length > 0) {
+        // Є що сортувати → крок тріажу.
+        try {
+          localStorage.setItem(
+            "ai-planner:triage-batch",
+            JSON.stringify(inboxIds)
+          );
+        } catch {
+          // ignore
+        }
+        router.push("/triage");
+      } else {
+        router.push("/today");
+      }
     } catch {
       setPhase("error");
     }
