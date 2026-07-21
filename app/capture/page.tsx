@@ -33,7 +33,7 @@ export default function CapturePage() {
       addParsed(data.tasks ?? []);
       setDraft(""); // очищаємо поле після успішного розбору
       setPhase("idle");
-      router.push("/inbox"); // ведемо туди, де зʼявилися задачі
+      router.push("/today"); // одразу показуємо день
     } catch {
       // Edge-case: помилка AI/мережі — зрозуміле повідомлення, не білий екран.
       setPhase("error");
