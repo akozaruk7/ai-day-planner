@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCaptureDraft, useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
+import Mascot from "@/components/Mascot";
 import type { ParsedTask } from "@/lib/types";
 
 type Phase = "idle" | "loading" | "error";
@@ -120,6 +121,10 @@ export default function CapturePage() {
   return (
     <main className="screen">
       <div className="capture">
+        <div className="capture__hello">
+          <Mascot state="calm" size={64} />
+          <p className="capture__invite">{t.capture.hintEmpty}</p>
+        </div>
         <textarea
           className="capture__input"
           placeholder={t.capture.placeholder}

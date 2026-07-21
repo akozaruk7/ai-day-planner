@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLang } from "@/lib/LanguageContext";
+import Icon from "@/components/Icon";
 
 export default function TabBar() {
   const pathname = usePathname();
   const { t } = useLang();
 
   const tabs = [
-    { href: "/capture", label: t.tab.capture, icon: "✍️" },
-    { href: "/inbox", label: t.tab.inbox, icon: "📥" },
-    { href: "/today", label: t.tab.today, icon: "✅" },
+    { href: "/capture", label: t.tab.capture, icon: "capture" as const },
+    { href: "/inbox", label: t.tab.inbox, icon: "inbox" as const },
+    { href: "/today", label: t.tab.today, icon: "today" as const },
   ];
 
   return (
@@ -26,7 +27,7 @@ export default function TabBar() {
             aria-current={active ? "page" : undefined}
           >
             <span className="tabbar__icon" aria-hidden>
-              {tab.icon}
+              <Icon name={tab.icon} />
             </span>
             <span className="tabbar__label">{tab.label}</span>
           </Link>

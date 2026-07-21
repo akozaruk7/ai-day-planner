@@ -29,7 +29,7 @@ export default function InboxPage() {
           {inbox.map((task) => (
             <li
               key={task.id}
-              className={`task${task.suggested ? " task--suggested" : ""}`}
+              className={`task task--${task.priority}${task.suggested ? " task--suggested" : ""}`}
             >
               <button
                 type="button"

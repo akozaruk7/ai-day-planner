@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTasks } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
+import Mascot from "@/components/Mascot";
 
 const BATCH_KEY = "ai-planner:triage-batch";
 
@@ -48,14 +49,19 @@ export default function TriagePage() {
 
   return (
     <main className="screen">
-      <h1 className="screen__title">{t.triage.title}</h1>
-      <p className="screen__subtitle">{t.triage.subtitle}</p>
+      <div className="triage__hero">
+        <Mascot state="thinking" size={72} />
+        <div>
+          <h1 className="screen__title">{t.triage.title}</h1>
+          <p className="screen__subtitle">{t.triage.subtitle}</p>
+        </div>
+      </div>
 
       <ul className="task-list">
         {sorted.map((task) => (
           <li
             key={task.id}
-            className={`task${task.suggested ? " task--suggested" : ""}`}
+            className={`task task--${task.priority}${task.suggested ? " task--suggested" : ""}`}
           >
             <div className="task__body">
               <span className="task__title">{task.title}</span>
