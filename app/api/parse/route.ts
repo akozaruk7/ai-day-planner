@@ -41,10 +41,16 @@ const SCHEMA = {
   required: ["tasks"],
 } as const;
 
-function systemPrompt(today: string, outputLang: string): string {
+function systemPrompt(
+  today: string,
+  outputLang: string,
+  availableMin: number
+): string {
   return `You turn a messy brain-dump into structured to-do tasks. Today's date is ${today}.
 
 Write every task "title" in ${outputLang}, regardless of the language of the dump.
+
+TIME LEFT TODAY: about ${availableMin} minutes before the user goes to sleep. Respect it when choosing what is for today: the combined estimateMin of all tasks you mark isToday=true OR suggested=true must not exceed about ${availableMin} minutes. Prefer fewer, higher-priority tasks that actually fit. A task with an explicit hard deadline of today still gets isToday=true even if time is tight, but do NOT pad "today" with discretionary items that won't fit. If almost no time remains, it is fine to mark nothing for today (everything goes to the inbox).
 
 For every distinct actionable item in the dump, output a task:
 - title: a short, clear imperative (e.g. "Call mom", "Finish the deck"). Clean it up; drop filler.
@@ -66,10 +72,14 @@ Ignore vague musings that aren't tasks. If the dump contains no real tasks, retu
 export async function POST(req: Request) {
   let text = "";
   let outputLang = "Ukrainian";
+  let availableMin = 960; // fallback: повний день неспання
   try {
     const body = await req.json();
     text = typeof body?.text === "string" ? body.text : "";
     outputLang = body?.lang === "en" ? "English" : "Ukrainian";
+    if (typeof body?.availableMin === "number" && body.availableMin >= 0) {
+      availableMin = Math.round(body.availableMin);
+    }
   } catch {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
@@ -91,7 +101,7 @@ export async function POST(req: Request) {
     const response = await client.messages.create({
       model: "claude-haiku-4-5",
       max_tokens: 2048,
-      system: systemPrompt(today, outputLang),
+      system: systemPrompt(today, outputLang, availableMin),
       messages: [{ role: "user", content: text }],
       tools: [
         {
