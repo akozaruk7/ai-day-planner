@@ -208,16 +208,32 @@ button {
 }
 
 /* Велика кнопка «розібрати на задачі» під палець */
+/* Привітання маскота над полем вводу */
+.capture__hello {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.capture__invite {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .parse-btn {
   width: 100%;
   min-height: 60px;
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   background: var(--accent);
-  color: var(--accent-contrast);
+  color: #fff;
+  font-family: var(--f-round);
   font-size: 18px;
-  font-weight: 700;
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+  font-weight: 800;
+  box-shadow: 0 10px 22px -8px
+    color-mix(in srgb, var(--accent) 70%, transparent);
   transition: transform 0.08s ease, opacity 0.15s ease;
 }
 
@@ -239,13 +255,14 @@ button {
 /* Кнопка голосового вводу */
 .mic-btn {
   width: 100%;
-  min-height: 52px;
-  border: 1px solid var(--border);
+  min-height: 48px;
+  border: 2px solid var(--sketch);
   border-radius: 14px;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 16px;
-  font-weight: 600;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--f-round);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .mic-btn:active {
@@ -253,9 +270,9 @@ button {
 }
 
 .mic-btn--on {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: var(--danger);
-  color: var(--danger);
+  background: var(--violet-soft);
+  border-color: var(--violet);
+  color: var(--violet);
   animation: mic-pulse 1.2s ease-in-out infinite;
 }
 
@@ -314,14 +331,15 @@ button {
 
 .progress__fill {
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--violet), var(--accent));
   border-radius: 999px;
   transition: width 0.35s ease;
 }
 
 .progress__label {
   font-size: 14px;
-  font-weight: 600;
+  font-family: var(--f-round);
+  font-weight: 800;
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -330,13 +348,13 @@ button {
 .capacity {
   margin-bottom: 18px;
   padding: 14px 16px;
-  border-radius: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--paper);
+  border: 2px solid var(--line);
 }
 
 .capacity--over {
-  border-color: var(--danger);
+  border-color: var(--hi);
 }
 
 .capacity__head {
@@ -372,7 +390,7 @@ button {
 .capacity__fill {
   height: 100%;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--lo);
   transition: width 0.35s ease;
 }
 
@@ -777,7 +795,7 @@ button {
 
 .screen__titlewrap {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
@@ -958,6 +976,20 @@ button {
 .day-item--done .day-item__title {
   text-decoration: line-through;
   color: var(--text-muted);
+}
+
+/* Режисований заголовок Triage: Ладо «зібрав план» */
+.triage__hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 18px;
+}
+.triage__hero .screen__title {
+  margin: 0;
+}
+.triage__hero .screen__subtitle {
+  margin: 2px 0 0;
 }
 
 /* ── Маскот Ладо ───────────────────────────────────────── */

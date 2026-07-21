@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
+import Mascot from "@/components/Mascot";
 import { CATEGORIES } from "@/lib/types";
 
 export default function TodayPage() {
@@ -89,6 +90,7 @@ export default function TodayPage() {
     <main className="screen">
       <div className="screen__head">
         <div className="screen__titlewrap">
+          <Mascot state={allDone ? "happy" : "calm"} size={52} />
           <h1 className="screen__title">{t.today.title}</h1>
           {dateLabel && <span className="screen__date">{dateLabel}</span>}
         </div>
@@ -122,7 +124,7 @@ export default function TodayPage() {
         ) : (
           <div className="empty">
             <span className="empty__icon" aria-hidden>
-              👋
+              <Mascot state="calm" size={64} />
             </span>
             <span className="empty__title">{t.today.emptyTitle}</span>
             <span className="empty__text">{t.today.emptyText}</span>
@@ -200,7 +202,7 @@ export default function TodayPage() {
           {allDone && (
             <div className="celebrate" role="status">
               <span className="celebrate__icon" aria-hidden>
-                🎉
+                <Mascot state="happy" size={64} />
               </span>
               <span className="celebrate__title">{t.today.celebrateTitle}</span>
               <span className="celebrate__text">{t.celebrateText(total)}</span>
@@ -272,7 +274,7 @@ export default function TodayPage() {
         <div className="modal-overlay" role="dialog" aria-modal="true">
           <div className="modal">
             <span className="modal__icon" aria-hidden>
-              {unfinished === 0 ? "🎉" : "🌙"}
+              <Mascot state={unfinished === 0 ? "happy" : "night"} size={56} />
             </span>
             <h2 className="modal__title">{t.endDay.title}</h2>
             <p className="modal__done">{t.endDay.done(doneCount, total)}</p>
