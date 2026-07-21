@@ -50,7 +50,8 @@ export default function InboxPage() {
                     type="button"
                     className="chip-edit"
                     onClick={() => cycleEstimate(task.id)}
-                    aria-label="Edit time estimate"
+                    aria-label={t.meta.editTimeHint}
+                    title={t.meta.editTimeHint}
                   >
                     {task.estimateMin != null
                       ? t.meta.min(task.estimateMin)

@@ -31,6 +31,9 @@ export interface Strings {
     emptyText: string;
     cta: string;
     celebrateTitle: string;
+    emptyInboxTitle: string;
+    emptyInboxText: (n: number) => string;
+    emptyInboxCta: string;
   };
   prio: Record<Priority, string>;
   cat: Record<Category, string>;
@@ -38,6 +41,7 @@ export interface Strings {
     min: (n: number) => string;
     due: (d: string) => string;
     setTime: string;
+    editTimeHint: string;
   };
   progress: (done: number, total: number) => string;
   celebrateText: (n: number) => string;
@@ -99,6 +103,10 @@ const uk: Strings = {
       "Поки нічого не заплановано. Вивали, що в голові — задачі на сьогодні зʼявляться тут чеклістом.",
     cta: "✍️ Почати захоплювати",
     celebrateTitle: "Ти закрив усі задачі на сьогодні!",
+    emptyInboxTitle: "Нічого на сьогодні",
+    emptyInboxText: (n) =>
+      `У Вхідних ${n} — жодну не позначено «на сьогодні». AI не вигадує дедлайнів, тож обери сам(а), що робитимеш сьогодні.`,
+    emptyInboxCta: "📥 Відкрити Вхідні",
   },
   prio: { low: "низький", medium: "середній", high: "високий" },
   cat: {
@@ -109,7 +117,12 @@ const uk: Strings = {
     chores: "побут",
     other: "інше",
   },
-  meta: { min: (n) => `${n} хв`, due: (d) => `до ${d}`, setTime: "⏱ час?" },
+  meta: {
+    min: (n) => `${n} хв`,
+    due: (d) => `до ${d}`,
+    setTime: "⏱ час?",
+    editTimeHint: "Натисни, щоб змінити час",
+  },
   progress: (done, total) => `${done} / ${total} виконано`,
   celebrateText: (n) => `${n} ${n === 1 ? "задача" : "задач"} виконано сьогодні. Красуня!`,
   capacity: {
@@ -176,6 +189,10 @@ const en: Strings = {
       "Nothing scheduled yet. Dump what's on your mind and your tasks for today will show up here as a checklist.",
     cta: "✍️ Start capturing",
     celebrateTitle: "You hit all your tasks for today!",
+    emptyInboxTitle: "Nothing for today",
+    emptyInboxText: (n) =>
+      `${n} in Inbox — none marked "for today". The AI doesn't invent deadlines, so pick what you'll do today.`,
+    emptyInboxCta: "📥 Open Inbox",
   },
   prio: { low: "low", medium: "medium", high: "high" },
   cat: {
@@ -186,7 +203,12 @@ const en: Strings = {
     chores: "chores",
     other: "other",
   },
-  meta: { min: (n) => `${n} min`, due: (d) => `due ${d}`, setTime: "⏱ time?" },
+  meta: {
+    min: (n) => `${n} min`,
+    due: (d) => `due ${d}`,
+    setTime: "⏱ time?",
+    editTimeHint: "Tap to change time",
+  },
   progress: (done, total) => `${done} / ${total} done`,
   celebrateText: (n) => `${n} ${n === 1 ? "task" : "tasks"} done today. Nice work.`,
   capacity: {

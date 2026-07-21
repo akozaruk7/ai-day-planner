@@ -9,6 +9,7 @@ import { CATEGORIES } from "@/lib/types";
 export default function TodayPage() {
   const {
     today,
+    inbox,
     doneCount,
     loaded,
     toggleDone,
@@ -103,18 +104,33 @@ export default function TodayPage() {
         </div>
       )}
 
-      {/* 3 стани: порожньо (онбординг) → в роботі (прогрес) → все виконано (перемога) */}
+      {/* Порожні стани: є задачі у Вхідних (пояснення) vs зовсім порожньо (онбординг) */}
       {loaded && total === 0 ? (
-        <div className="empty">
-          <span className="empty__icon" aria-hidden>
-            👋
-          </span>
-          <span className="empty__title">{t.today.emptyTitle}</span>
-          <span className="empty__text">{t.today.emptyText}</span>
-          <Link href="/capture" className="cta">
-            {t.today.cta}
-          </Link>
-        </div>
+        inbox.length > 0 ? (
+          <div className="empty">
+            <span className="empty__icon" aria-hidden>
+              💡
+            </span>
+            <span className="empty__title">{t.today.emptyInboxTitle}</span>
+            <span className="empty__text">
+              {t.today.emptyInboxText(inbox.length)}
+            </span>
+            <Link href="/inbox" className="cta">
+              {t.today.emptyInboxCta}
+            </Link>
+          </div>
+        ) : (
+          <div className="empty">
+            <span className="empty__icon" aria-hidden>
+              👋
+            </span>
+            <span className="empty__title">{t.today.emptyTitle}</span>
+            <span className="empty__text">{t.today.emptyText}</span>
+            <Link href="/capture" className="cta">
+              {t.today.cta}
+            </Link>
+          </div>
+        )
       ) : (
         <>
           {total > 0 && (
@@ -218,7 +234,8 @@ export default function TodayPage() {
                         type="button"
                         className="chip-edit"
                         onClick={() => cycleEstimate(task.id)}
-                        aria-label="Edit time estimate"
+                        aria-label={t.meta.editTimeHint}
+                        title={t.meta.editTimeHint}
                       >
                         {task.estimateMin != null
                           ? t.meta.min(task.estimateMin)

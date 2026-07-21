@@ -620,6 +620,17 @@ button {
   border-style: solid;
 }
 
+/* Hover-підказка про редагування (десктоп) */
+@media (hover: hover) {
+  .chip-edit:hover {
+    background: var(--surface);
+    border-style: solid;
+    border-color: var(--accent);
+    color: var(--accent);
+    cursor: pointer;
+  }
+}
+
 /* Підсвічена рекомендована задача */
 .task--suggested {
   border-color: var(--accent);
