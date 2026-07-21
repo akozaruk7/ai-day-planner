@@ -89,7 +89,7 @@
 |---|---|---|---|
 | high | 🔴 | Критично | Critical |
 | medium | 🟠 | Важливо | Important |
-| low | 🟢 | На десерт | Nice-to-have |
+| low | 🟢 | На десерт | Nice-to-do |
 
 Правити в `lib/i18n.ts` (`prio` для обох мов) — зараз там `низький/середній/високий` та `low/medium/high`.
 

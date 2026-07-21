@@ -15,7 +15,7 @@
 - Токени визначаються для світлої І темної теми (`@media (prefers-color-scheme: dark)`).
 - Анімації поважають `@media (prefers-reduced-motion: reduce)`.
 - Жодних емодзі як **функціональних** іконок (таб-бар, дії). Скетч-набір або SVG.
-- Назви пріоритетів: 🔴 Критично / 🟠 Важливо / 🟢 На десерт (EN: Critical / Important / Nice-to-have).
+- Назви пріоритетів: 🔴 Критично / 🟠 Важливо / 🟢 На десерт (EN: Critical / Important / Nice-to-do).
 - Шрифт заголовків: системний округлий `ui-rounded, "SF Pro Rounded", ...` з фолбеком.
 - Гілка: `design-system-mascot`. **Не пушити в `main` без явного схвалення користувача.**
 - Верифікація кожної задачі: `npm run build` проходить БЕЗ помилок + візуальна перевірка потрібного екрана в `npm run dev` + перевірка, що функціонал екрана не зламано.
@@ -199,7 +199,7 @@ git commit -m "Дизайн-токени: тепла яскрава палітр
 Знайти `prio: { low: "low", medium: "medium", high: "high" }` і замінити на:
 
 ```ts
-  prio: { low: "nice-to-have", medium: "important", high: "critical" },
+  prio: { low: "nice-to-do", medium: "important", high: "critical" },
 ```
 
 - [ ] **Step 3: Верифікація**

@@ -114,7 +114,7 @@ const uk: Strings = {
       `У Вхідних ${n} — жодну не позначено «на сьогодні». AI не вигадує дедлайнів, тож обери сам(а), що робитимеш сьогодні.`,
     emptyInboxCta: "📥 Відкрити Вхідні",
   },
-  prio: { low: "низький", medium: "середній", high: "високий" },
+  prio: { low: "на десерт", medium: "важливо", high: "критично" },
   cat: {
     work: "робота",
     sport: "спорт",
@@ -206,7 +206,7 @@ const en: Strings = {
       `${n} in Inbox — none marked "for today". The AI doesn't invent deadlines, so pick what you'll do today.`,
     emptyInboxCta: "📥 Open Inbox",
   },
-  prio: { low: "low", medium: "medium", high: "high" },
+  prio: { low: "nice-to-do", medium: "important", high: "critical" },
   cat: {
     work: "work",
     sport: "sport",
