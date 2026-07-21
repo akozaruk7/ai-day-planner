@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCaptureDraft, useTasks } from "@/lib/useTasks";
+import { useCaptureDraft, useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
 import type { ParsedTask } from "@/lib/types";
 
@@ -12,6 +12,7 @@ type Phase = "idle" | "loading" | "error";
 export default function CapturePage() {
   const { draft, setDraft } = useCaptureDraft();
   const { addParsed } = useTasks();
+  const { bedtimeMin } = useDayBudget();
   const { t, lang } = useLang();
   const router = useRouter();
 
@@ -80,11 +81,15 @@ export default function CapturePage() {
     if (isEmpty || phase === "loading") return;
     recognitionRef.current?.stop(); // зупиняємо диктування перед розбором
     setPhase("loading");
+    // Залишок часу до сну (як на Today) — щоб AI не переобіцяв на сьогодні.
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const availableMin = Math.max(0, Math.min(16 * 60, bedtimeMin - nowMin));
     try {
       const res = await fetch("/api/parse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: draft, lang }),
+        body: JSON.stringify({ text: draft, lang, availableMin }),
       });
 
       if (!res.ok) throw new Error(`status ${res.status}`);
