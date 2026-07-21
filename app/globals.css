@@ -484,18 +484,17 @@ button {
 
 .prio--high {
   background: rgba(239, 68, 68, 0.15);
-  color: var(--danger);
+  color: #dc2626; /* червоний */
 }
 
 .prio--medium {
-  background: rgba(245, 158, 11, 0.18);
-  color: #b45309;
+  background: rgba(249, 115, 22, 0.16);
+  color: #ea580c; /* помаранчевий */
 }
 
 .prio--low {
-  background: var(--bg);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
+  background: rgba(234, 179, 8, 0.2);
+  color: #a16207; /* жовтий */
 }
 
 /* Категорії — піл */
@@ -515,8 +514,8 @@ button {
   color: #059669;
 }
 .cat--leisure {
-  background: rgba(245, 158, 11, 0.18);
-  color: #b45309;
+  background: rgba(8, 145, 178, 0.15);
+  color: #0891b2; /* бірюзовий */
 }
 .cat--family {
   background: rgba(236, 72, 153, 0.15);
@@ -546,7 +545,7 @@ button {
   background: #059669;
 }
 .cat-dot.cat--leisure {
-  background: #f59e0b;
+  background: #0891b2;
 }
 .cat-dot.cat--family {
   background: #db2777;

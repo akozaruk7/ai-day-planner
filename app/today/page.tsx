@@ -6,9 +6,16 @@ import { useLang } from "@/lib/LanguageContext";
 import { CATEGORIES } from "@/lib/types";
 
 export default function TodayPage() {
-  const { today, doneCount, loaded, toggleDone, moveToInbox } = useTasks();
+  const { today, doneCount, loaded, toggleDone, moveToInbox, cycleEstimate } =
+    useTasks();
   const { availableMin, increase, decrease } = useDayBudget();
   const { t } = useLang();
+
+  // Список від найпріоритетніших до менш пріоритетних (стабільне сортування).
+  const prioWeight = { high: 3, medium: 2, low: 1 } as const;
+  const sortedToday = [...today].sort(
+    (a, b) => prioWeight[b.priority] - prioWeight[a.priority]
+  );
 
   const total = today.length;
   const allDone = total > 0 && doneCount === total;
@@ -121,7 +128,7 @@ export default function TodayPage() {
           )}
 
           <ul className="task-list">
-            {today.map((task) => {
+            {sortedToday.map((task) => {
               const done = task.status === "done";
               return (
                 <li key={task.id} className="task">
@@ -133,11 +140,28 @@ export default function TodayPage() {
                   >
                     {done ? "✓" : ""}
                   </button>
-                  <span
-                    className={`task__title${done ? " task__title--done" : ""}`}
-                  >
-                    {task.title}
-                  </span>
+                  <div className="task__body">
+                    <span
+                      className={`task__title${done ? " task__title--done" : ""}`}
+                    >
+                      {task.title}
+                    </span>
+                    <span className="task__meta">
+                      <span className={`prio prio--${task.priority}`}>
+                        {t.prio[task.priority]}
+                      </span>
+                      <button
+                        type="button"
+                        className="chip-edit"
+                        onClick={() => cycleEstimate(task.id)}
+                        aria-label="Edit time estimate"
+                      >
+                        {task.estimateMin != null
+                          ? t.meta.min(task.estimateMin)
+                          : t.meta.setTime}
+                      </button>
+                    </span>
+                  </div>
                   {!done && (
                     <button
                       type="button"
