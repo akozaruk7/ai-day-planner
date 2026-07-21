@@ -228,22 +228,25 @@ export function useHistory() {
   return { records: sorted, loaded };
 }
 
-const BUDGET_KEY = "ai-planner:day-budget";
-const DEFAULT_BUDGET_MIN = 960; // 16 год = доба − 8 год сну (планер усього дня)
-const BUDGET_STEP = 60; // крок 1 год
-const BUDGET_MIN = 240; // 4 год
-const BUDGET_MAX = 1200; // 20 год
+const BEDTIME_KEY = "ai-planner:bedtime-min";
+const DEFAULT_BEDTIME_MIN = 23 * 60; // 23:00
+const BEDTIME_STEP = 30;
+const BEDTIME_MIN = 18 * 60; // 18:00
+const BEDTIME_MAX = 24 * 60 - 1; // 23:59
 
-/** Налаштовуваний бюджет часу на день (хвилини), persist у localStorage. */
+/**
+ * Час відходу до сну (хвилини від початку доби), persist у localStorage.
+ * Доступний час на день рахується як «від зараз до сну» (див. Today).
+ */
 export function useDayBudget() {
-  const [availableMin, setAvailableMin] = useState(DEFAULT_BUDGET_MIN);
+  const [bedtimeMin, setBedtime] = useState(DEFAULT_BEDTIME_MIN);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(BUDGET_KEY);
+      const raw = localStorage.getItem(BEDTIME_KEY);
       const n = raw ? parseInt(raw, 10) : NaN;
-      if (Number.isFinite(n)) setAvailableMin(n);
+      if (Number.isFinite(n)) setBedtime(n);
     } catch {
       // ignore
     }
@@ -251,20 +254,20 @@ export function useDayBudget() {
   }, []);
 
   const persist = useCallback((min: number) => {
-    const clamped = Math.min(BUDGET_MAX, Math.max(BUDGET_MIN, min));
-    setAvailableMin(clamped);
+    const clamped = Math.min(BEDTIME_MAX, Math.max(BEDTIME_MIN, min));
+    setBedtime(clamped);
     try {
-      localStorage.setItem(BUDGET_KEY, String(clamped));
+      localStorage.setItem(BEDTIME_KEY, String(clamped));
     } catch {
       // ignore
     }
   }, []);
 
   return {
-    availableMin,
+    bedtimeMin,
     loaded,
-    increase: () => persist(availableMin + BUDGET_STEP),
-    decrease: () => persist(availableMin - BUDGET_STEP),
+    increase: () => persist(bedtimeMin + BEDTIME_STEP),
+    decrease: () => persist(bedtimeMin - BEDTIME_STEP),
   };
 }
 

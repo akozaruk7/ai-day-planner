@@ -16,7 +16,7 @@ export default function TodayPage() {
     cycleEstimate,
     endDay,
   } = useTasks();
-  const { availableMin, increase, decrease } = useDayBudget();
+  const { bedtimeMin, increase, decrease } = useDayBudget();
   const { t, lang } = useLang();
 
   const [ending, setEnding] = useState(false);
@@ -65,9 +65,17 @@ export default function TodayPage() {
   // Навантаження дня: сума оцінок задач Today проти бюджету часу.
   const plannedMin = today.reduce((sum, tk) => sum + (tk.estimateMin ?? 0), 0);
   const unestimated = today.filter((tk) => tk.estimateMin == null).length;
+  // Доступний час = від «зараз» до сну, обмежено 16 год неспання.
+  const nowMin = mounted
+    ? new Date().getHours() * 60 + new Date().getMinutes()
+    : 0;
+  const availableMin = Math.max(0, Math.min(16 * 60, bedtimeMin - nowMin));
   const over = plannedMin > availableMin;
   const loadPct =
     availableMin > 0 ? Math.min(100, Math.round((plannedMin / availableMin) * 100)) : 0;
+  const bedtimeLabel = `${String(Math.floor(bedtimeMin / 60)).padStart(2, "0")}:${String(
+    bedtimeMin % 60
+  ).padStart(2, "0")}`;
 
   // Розбивка дня по категоріях (лише присутні, у сталому порядку).
   const byCat: Record<string, number> = {};
@@ -153,17 +161,18 @@ export default function TodayPage() {
                       : ""}
                 </span>
                 <div className="capacity__stepper">
+                  <span className="capacity__bedtime">🌙 {bedtimeLabel}</span>
                   <button
                     type="button"
                     onClick={decrease}
-                    aria-label="Less time available"
+                    aria-label="Earlier bedtime"
                   >
                     −
                   </button>
                   <button
                     type="button"
                     onClick={increase}
-                    aria-label="More time available"
+                    aria-label="Later bedtime"
                   >
                     +
                   </button>

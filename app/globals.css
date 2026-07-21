@@ -369,8 +369,16 @@ button {
 
 .capacity__stepper {
   display: flex;
+  align-items: center;
   gap: 6px;
   flex-shrink: 0;
+}
+
+.capacity__bedtime {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: 2px;
 }
 
 .capacity__stepper button {
