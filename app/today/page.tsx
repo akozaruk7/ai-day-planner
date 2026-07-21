@@ -1,15 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
 import { CATEGORIES } from "@/lib/types";
 
 export default function TodayPage() {
-  const { today, doneCount, loaded, toggleDone, moveToInbox, cycleEstimate } =
-    useTasks();
+  const {
+    today,
+    doneCount,
+    loaded,
+    toggleDone,
+    moveToInbox,
+    cycleEstimate,
+    endDay,
+  } = useTasks();
   const { availableMin, increase, decrease } = useDayBudget();
   const { t } = useLang();
+
+  const [ending, setEnding] = useState(false);
 
   // Список від найпріоритетніших до менш пріоритетних (стабільне сортування).
   const prioWeight = { high: 3, medium: 2, low: 1 } as const;
@@ -20,6 +30,7 @@ export default function TodayPage() {
   const total = today.length;
   const allDone = total > 0 && doneCount === total;
   const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+  const unfinished = total - doneCount;
 
   // Навантаження дня: сума оцінок задач Today проти бюджету часу.
   const plannedMin = today.reduce((sum, tk) => sum + (tk.estimateMin ?? 0), 0);
@@ -37,7 +48,12 @@ export default function TodayPage() {
 
   return (
     <main className="screen">
-      <h1 className="screen__title">{t.today.title}</h1>
+      <div className="screen__head">
+        <h1 className="screen__title">{t.today.title}</h1>
+        <Link href="/history" className="history-link">
+          {t.history.link}
+        </Link>
+      </div>
       <p className="screen__subtitle">{t.today.subtitle}</p>
 
       {/* 3 стани: порожньо (онбординг) → в роботі (прогрес) → все виконано (перемога) */}
@@ -176,7 +192,75 @@ export default function TodayPage() {
               );
             })}
           </ul>
+
+          <button
+            type="button"
+            className="end-day-btn"
+            onClick={() => setEnding(true)}
+          >
+            {t.endDay.button}
+          </button>
         </>
+      )}
+
+      {ending && (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal">
+            <span className="modal__icon" aria-hidden>
+              {unfinished === 0 ? "🎉" : "🌙"}
+            </span>
+            <h2 className="modal__title">{t.endDay.title}</h2>
+            <p className="modal__done">{t.endDay.done(doneCount, total)}</p>
+
+            {unfinished === 0 ? (
+              <>
+                <p className="modal__msg">{t.endDay.allDone}</p>
+                <button
+                  type="button"
+                  className="modal__btn modal__btn--primary"
+                  onClick={() => {
+                    endDay(true);
+                    setEnding(false);
+                  }}
+                >
+                  {t.endDay.button}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="modal__msg">{t.endDay.unfinishedQ(unfinished)}</p>
+                <button
+                  type="button"
+                  className="modal__btn modal__btn--primary"
+                  onClick={() => {
+                    endDay(true);
+                    setEnding(false);
+                  }}
+                >
+                  {t.endDay.carry}
+                </button>
+                <button
+                  type="button"
+                  className="modal__btn"
+                  onClick={() => {
+                    endDay(false);
+                    setEnding(false);
+                  }}
+                >
+                  {t.endDay.toInbox}
+                </button>
+              </>
+            )}
+
+            <button
+              type="button"
+              className="modal__cancel"
+              onClick={() => setEnding(false)}
+            >
+              {t.endDay.cancel}
+            </button>
+          </div>
+        </div>
       )}
     </main>
   );

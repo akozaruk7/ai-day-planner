@@ -29,6 +29,21 @@ export interface Task {
   createdAt: number;
 }
 
+/** Запис одного завершеного дня для історії. */
+export interface DayRecord {
+  id: string;
+  endedAt: number; // timestamp завершення
+  date: string; // YYYY-MM-DD (локальна дата)
+  done: number;
+  total: number;
+  items: {
+    title: string;
+    done: boolean;
+    category: Category;
+    priority: Priority;
+  }[];
+}
+
 /** Форма однієї задачі, яку повертає AI (без id/status/createdAt — їх додає клієнт). */
 export interface ParsedTask {
   title: string;

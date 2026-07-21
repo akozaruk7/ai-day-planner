@@ -45,6 +45,22 @@ export interface Strings {
     noEstimate: (n: number) => string;
     fmt: (min: number) => string;
   };
+  endDay: {
+    button: string;
+    title: string;
+    done: (d: number, total: number) => string;
+    unfinishedQ: (n: number) => string;
+    carry: string;
+    toInbox: string;
+    allDone: string;
+    cancel: string;
+  };
+  history: {
+    title: string;
+    link: string;
+    empty: string;
+    emptyText: string;
+  };
 }
 
 const uk: Strings = {
@@ -101,6 +117,22 @@ const uk: Strings = {
       return `${m} хв`;
     },
   },
+  endDay: {
+    button: "Завершити день",
+    title: "Підсумок дня",
+    done: (d, total) => `Виконано ${d} з ${total}`,
+    unfinishedQ: (n) => `${n} незавершених — що з ними?`,
+    carry: "Перенести на завтра",
+    toInbox: "Повернути в Inbox",
+    allDone: "Усе виконано! 🎉",
+    cancel: "Скасувати",
+  },
+  history: {
+    title: "Історія",
+    link: "🗓 Історія",
+    empty: "Історія порожня",
+    emptyText: "Заверши день на «Сьогодні» — тут зʼявлятимуться підсумки.",
+  },
 };
 
 const en: Strings = {
@@ -156,6 +188,22 @@ const en: Strings = {
       if (h) return `${h}h`;
       return `${m}m`;
     },
+  },
+  endDay: {
+    button: "End the day",
+    title: "Day summary",
+    done: (d, total) => `${d} of ${total} done`,
+    unfinishedQ: (n) => `${n} unfinished — what now?`,
+    carry: "Carry to tomorrow",
+    toInbox: "Move to Inbox",
+    allDone: "All done! 🎉",
+    cancel: "Cancel",
+  },
+  history: {
+    title: "History",
+    link: "🗓 History",
+    empty: "No history yet",
+    emptyText: "End a day on Today — summaries will show up here.",
   },
 };
 

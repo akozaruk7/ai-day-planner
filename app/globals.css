@@ -661,3 +661,172 @@ button {
   font-size: 24px;
   line-height: 1;
 }
+
+/* Шапка екрана (заголовок + лінк на історію) */
+.screen__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.history-link {
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 8px 0;
+}
+
+/* Кнопка «Завершити день» */
+.end-day-btn {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.end-day-btn:active {
+  opacity: 0.85;
+}
+
+/* Модалка підсумку дня (bottom sheet) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg);
+  border-radius: 20px;
+  padding: 24px 20px calc(20px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.modal__icon {
+  font-size: 44px;
+}
+
+.modal__title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modal__done {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0;
+}
+
+.modal__msg {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin: 4px 0 8px;
+}
+
+.modal__btn {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.modal__btn--primary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.modal__btn:active {
+  opacity: 0.85;
+}
+
+.modal__cancel {
+  margin-top: 4px;
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+/* Історія днів */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.day-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.day-card__date {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.day-card__ratio {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.day-card__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.day-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.day-item__mark {
+  width: 16px;
+  color: var(--text-muted);
+}
+
+.day-item--done .day-item__title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}

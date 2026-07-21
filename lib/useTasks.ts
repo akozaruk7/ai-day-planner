@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { CATEGORIES } from "./types";
-import type { Category, ParsedTask, Task } from "./types";
+import type { Category, DayRecord, ParsedTask, Task } from "./types";
+
+const HISTORY_KEY = "ai-planner:history";
 
 function normCategory(c: unknown): Category {
   return CATEGORIES.includes(c as Category) ? (c as Category) : "other";
@@ -136,6 +138,52 @@ export function useTasks() {
     );
   }, []);
 
+  // Завершити день: зберегти підсумок в історію, прибрати виконані,
+  // а незавершені — перенести на завтра (лишити в Today) або в Inbox.
+  const endDay = useCallback(
+    (carryOver: boolean) => {
+      const todays = tasks.filter(
+        (t) => t.status === "today" || t.status === "done"
+      );
+      if (todays.length === 0) return;
+
+      const record: DayRecord = {
+        id: newId(),
+        endedAt: Date.now(),
+        date: todayISO(),
+        done: todays.filter((t) => t.status === "done").length,
+        total: todays.length,
+        items: todays.map((t) => ({
+          title: t.title,
+          done: t.status === "done",
+          category: t.category,
+          priority: t.priority,
+        })),
+      };
+
+      // Дописуємо в історію (side effect поза setTasks — щоб StrictMode не задублював).
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        const hist: DayRecord[] = raw ? JSON.parse(raw) : [];
+        hist.push(record);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+      } catch {
+        // ignore
+      }
+
+      setTasks((prev) =>
+        prev
+          .filter((t) => t.status !== "done") // виконані → лише в історії
+          .map((t) =>
+            t.status === "today"
+              ? { ...t, status: carryOver ? "today" : "inbox" }
+              : t
+          )
+      );
+    },
+    [tasks]
+  );
+
   const removeTask = useCallback((id: string) => {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
@@ -155,8 +203,29 @@ export function useTasks() {
     moveToToday,
     moveToInbox,
     cycleEstimate,
+    endDay,
     removeTask,
   };
+}
+
+/** Читання історії завершених днів (для екрана /history). */
+export function useHistory() {
+  const [records, setRecords] = useState<DayRecord[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if (raw) setRecords(JSON.parse(raw) as DayRecord[]);
+    } catch {
+      // ignore
+    }
+    setLoaded(true);
+  }, []);
+
+  // Найновіші зверху.
+  const sorted = [...records].sort((a, b) => b.endedAt - a.endedAt);
+  return { records: sorted, loaded };
 }
 
 const BUDGET_KEY = "ai-planner:day-budget";
