@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
@@ -17,9 +17,39 @@ export default function TodayPage() {
     endDay,
   } = useTasks();
   const { availableMin, increase, decrease } = useDayBudget();
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   const [ending, setEnding] = useState(false);
+  const [toast, setToast] = useState("");
+
+  // Поточна дата рахуємо лише на клієнті (щоб не було hydration mismatch).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const dateLabel = mounted
+    ? new Intl.DateTimeFormat(lang === "uk" ? "uk-UA" : "en-US", {
+        day: "numeric",
+        month: "long",
+      }).format(new Date())
+    : "";
+
+  // Автозникнення тоста.
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(""), 4000);
+    return () => clearTimeout(id);
+  }, [toast]);
+
+  function finishDay(carry: boolean) {
+    const msg =
+      unfinished === 0
+        ? t.endDay.toastAllDone
+        : carry
+          ? t.endDay.toastCarry(unfinished)
+          : t.endDay.toastInbox(unfinished);
+    endDay(carry);
+    setEnding(false);
+    setToast(msg);
+  }
 
   // Список від найпріоритетніших до менш пріоритетних (стабільне сортування).
   const prioWeight = { high: 3, medium: 2, low: 1 } as const;
@@ -49,12 +79,21 @@ export default function TodayPage() {
   return (
     <main className="screen">
       <div className="screen__head">
-        <h1 className="screen__title">{t.today.title}</h1>
+        <div className="screen__titlewrap">
+          <h1 className="screen__title">{t.today.title}</h1>
+          {dateLabel && <span className="screen__date">{dateLabel}</span>}
+        </div>
         <Link href="/history" className="history-link">
           {t.history.link}
         </Link>
       </div>
       <p className="screen__subtitle">{t.today.subtitle}</p>
+
+      {toast && (
+        <div className="toast" role="status">
+          {toast}
+        </div>
+      )}
 
       {/* 3 стани: порожньо (онбординг) → в роботі (прогрес) → все виконано (перемога) */}
       {loaded && total === 0 ? (
@@ -218,10 +257,7 @@ export default function TodayPage() {
                 <button
                   type="button"
                   className="modal__btn modal__btn--primary"
-                  onClick={() => {
-                    endDay(true);
-                    setEnding(false);
-                  }}
+                  onClick={() => finishDay(true)}
                 >
                   {t.endDay.button}
                 </button>
@@ -232,20 +268,14 @@ export default function TodayPage() {
                 <button
                   type="button"
                   className="modal__btn modal__btn--primary"
-                  onClick={() => {
-                    endDay(true);
-                    setEnding(false);
-                  }}
+                  onClick={() => finishDay(true)}
                 >
                   {t.endDay.carry}
                 </button>
                 <button
                   type="button"
                   className="modal__btn"
-                  onClick={() => {
-                    endDay(false);
-                    setEnding(false);
-                  }}
+                  onClick={() => finishDay(false)}
                 >
                   {t.endDay.toInbox}
                 </button>

@@ -54,6 +54,9 @@ export interface Strings {
     toInbox: string;
     allDone: string;
     cancel: string;
+    toastCarry: (n: number) => string;
+    toastInbox: (n: number) => string;
+    toastAllDone: string;
   };
   history: {
     title: string;
@@ -126,6 +129,9 @@ const uk: Strings = {
     toInbox: "Повернути в Inbox",
     allDone: "Усе виконано! 🎉",
     cancel: "Скасувати",
+    toastCarry: (n) => `✓ День завершено. Перенесено на завтра: ${n}.`,
+    toastInbox: (n) => `✓ День завершено. Повернуто в Inbox: ${n}.`,
+    toastAllDone: "✓ День завершено. Усе виконано! 🎉",
   },
   history: {
     title: "Історія",
@@ -198,6 +204,9 @@ const en: Strings = {
     toInbox: "Move to Inbox",
     allDone: "All done! 🎉",
     cancel: "Cancel",
+    toastCarry: (n) => `✓ Day ended. Carried to tomorrow: ${n}.`,
+    toastInbox: (n) => `✓ Day ended. Moved to Inbox: ${n}.`,
+    toastAllDone: "✓ Day ended. All done! 🎉",
   },
   history: {
     title: "History",

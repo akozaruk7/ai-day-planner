@@ -670,6 +670,19 @@ button {
   gap: 10px;
 }
 
+.screen__titlewrap {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.screen__date {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 .history-link {
   flex-shrink: 0;
   font-size: 14px;
@@ -677,6 +690,17 @@ button {
   color: var(--accent);
   text-decoration: none;
   padding: 8px 0;
+}
+
+/* Тост-фідбек (напр. після завершення дня) */
+.toast {
+  margin: 4px 0 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* Кнопка «Завершити день» */
