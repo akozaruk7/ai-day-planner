@@ -1010,7 +1010,8 @@ button {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mascot {
+  .mascot,
+  .mic-btn--on {
     animation: none !important;
   }
 }

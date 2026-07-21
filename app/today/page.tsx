@@ -111,7 +111,7 @@ export default function TodayPage() {
         inbox.length > 0 ? (
           <div className="empty">
             <span className="empty__icon" aria-hidden>
-              💡
+              <Mascot state="thinking" size={64} />
             </span>
             <span className="empty__title">{t.today.emptyInboxTitle}</span>
             <span className="empty__text">
