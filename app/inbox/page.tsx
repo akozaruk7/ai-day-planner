@@ -40,6 +40,9 @@ export default function InboxPage() {
               <div className="task__body">
                 <span className="task__title">{task.title}</span>
                 <span className="task__meta">
+                  <span className={`cat cat--${task.category}`}>
+                    {t.cat[task.category]}
+                  </span>
                   <span className={`prio prio--${task.priority}`}>
                     {t.prio[task.priority]}
                   </span>

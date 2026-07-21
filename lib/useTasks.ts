@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { ParsedTask, Task } from "./types";
+import { CATEGORIES } from "./types";
+import type { Category, ParsedTask, Task } from "./types";
+
+function normCategory(c: unknown): Category {
+  return CATEGORIES.includes(c as Category) ? (c as Category) : "other";
+}
 
 const TASKS_KEY = "ai-planner:tasks";
 
@@ -48,7 +53,11 @@ export function useTasks() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(TASKS_KEY);
-      if (raw) setTasks(JSON.parse(raw) as Task[]);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Task[];
+        // Міграція: старі задачі без category отримують "other".
+        setTasks(parsed.map((t) => ({ ...t, category: normCategory(t.category) })));
+      }
     } catch {
       // пошкоджені дані — стартуємо з порожнього списку
     }
@@ -74,6 +83,7 @@ export function useTasks() {
         id: newId(),
         title: p.title,
         priority: p.priority,
+        category: normCategory(p.category),
         estimateMin: typeof p.estimateMin === "number" ? p.estimateMin : null,
         deadline,
         status,
@@ -146,6 +156,46 @@ export function useTasks() {
     moveToInbox,
     cycleEstimate,
     removeTask,
+  };
+}
+
+const BUDGET_KEY = "ai-planner:day-budget";
+const DEFAULT_BUDGET_MIN = 960; // 16 год = доба − 8 год сну (планер усього дня)
+const BUDGET_STEP = 60; // крок 1 год
+const BUDGET_MIN = 240; // 4 год
+const BUDGET_MAX = 1200; // 20 год
+
+/** Налаштовуваний бюджет часу на день (хвилини), persist у localStorage. */
+export function useDayBudget() {
+  const [availableMin, setAvailableMin] = useState(DEFAULT_BUDGET_MIN);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(BUDGET_KEY);
+      const n = raw ? parseInt(raw, 10) : NaN;
+      if (Number.isFinite(n)) setAvailableMin(n);
+    } catch {
+      // ignore
+    }
+    setLoaded(true);
+  }, []);
+
+  const persist = useCallback((min: number) => {
+    const clamped = Math.min(BUDGET_MAX, Math.max(BUDGET_MIN, min));
+    setAvailableMin(clamped);
+    try {
+      localStorage.setItem(BUDGET_KEY, String(clamped));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  return {
+    availableMin,
+    loaded,
+    increase: () => persist(availableMin + BUDGET_STEP),
+    decrease: () => persist(availableMin - BUDGET_STEP),
   };
 }
 

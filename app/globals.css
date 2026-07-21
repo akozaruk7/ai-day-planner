@@ -279,6 +279,115 @@ button {
   white-space: nowrap;
 }
 
+/* Навантаження дня (capacity) */
+.capacity {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.capacity--over {
+  border-color: var(--danger);
+}
+
+.capacity__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.capacity__label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.capacity__nums {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.capacity--over .capacity__nums {
+  color: var(--danger);
+}
+
+.capacity__bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.capacity__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.35s ease;
+}
+
+.capacity--over .capacity__fill {
+  background: var(--danger);
+}
+
+.capacity__breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.capacity__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  min-height: 36px;
+}
+
+.capacity__msg {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.capacity--over .capacity__msg {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.capacity__stepper {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.capacity__stepper button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.capacity__stepper button:active {
+  background: var(--surface);
+}
+
 /* Святковий стан «все виконано» */
 .celebrate {
   display: flex;
@@ -387,6 +496,66 @@ button {
   background: var(--bg);
   color: var(--text-muted);
   border: 1px solid var(--border);
+}
+
+/* Категорії — піл */
+.cat {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cat--work {
+  background: rgba(79, 70, 229, 0.15);
+  color: #4f46e5;
+}
+.cat--sport {
+  background: rgba(16, 185, 129, 0.16);
+  color: #059669;
+}
+.cat--leisure {
+  background: rgba(245, 158, 11, 0.18);
+  color: #b45309;
+}
+.cat--family {
+  background: rgba(236, 72, 153, 0.15);
+  color: #db2777;
+}
+.cat--chores {
+  background: rgba(100, 116, 139, 0.16);
+  color: #475569;
+}
+.cat--other {
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+/* Кольорова крапка для розбивки дня */
+.cat-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.cat-dot.cat--work {
+  background: #4f46e5;
+}
+.cat-dot.cat--sport {
+  background: #059669;
+}
+.cat-dot.cat--leisure {
+  background: #f59e0b;
+}
+.cat-dot.cat--family {
+  background: #db2777;
+}
+.cat-dot.cat--chores {
+  background: #64748b;
+}
+.cat-dot.cat--other {
+  background: var(--text-muted);
 }
 
 .badge {

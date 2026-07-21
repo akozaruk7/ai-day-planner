@@ -17,6 +17,10 @@ const SCHEMA = {
         properties: {
           title: { type: "string" },
           priority: { type: "string", enum: ["low", "medium", "high"] },
+          category: {
+            type: "string",
+            enum: ["work", "sport", "leisure", "family", "chores", "other"],
+          },
           estimateMin: { anyOf: [{ type: "integer" }, { type: "null" }] },
           deadline: { anyOf: [{ type: "string" }, { type: "null" }] },
           isToday: { type: "boolean" },
@@ -25,6 +29,7 @@ const SCHEMA = {
         required: [
           "title",
           "priority",
+          "category",
           "estimateMin",
           "deadline",
           "isToday",
@@ -44,6 +49,7 @@ Write every task "title" in ${outputLang}, regardless of the language of the dum
 For every distinct actionable item in the dump, output a task:
 - title: a short, clear imperative (e.g. "Call mom", "Finish the deck"). Clean it up; drop filler.
 - priority: "low" | "medium" | "high" — see the prioritization principle below.
+- category: the kind of activity — one of "work", "sport", "leisure", "family", "chores", "other". This app plans the whole day, so sport, leisure, and family time are valid tasks, not just work. Pick "other" only if none fit.
 - estimateMin: a rough time estimate as ONE of these buckets of minutes: 5, 15, 30, 60, 120. Pick the closest bucket from the task's type and complexity (a quick message/call ~5–15, a focused task ~30–60, something big or vague ~120). Use null only if you genuinely cannot tell.
 - deadline: an ISO date "YYYY-MM-DD" ONLY if the text implies one (resolve "tomorrow", "Friday", "next week" relative to today). If no date is stated or implied, use null — NEVER invent a deadline.
 - isToday: true only if the item is explicitly for today or clearly urgent/now.

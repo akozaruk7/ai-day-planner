@@ -1,4 +1,4 @@
-import type { Priority } from "./types";
+import type { Category, Priority } from "./types";
 
 export type Lang = "uk" | "en";
 
@@ -31,6 +31,7 @@ export interface Strings {
     celebrateTitle: string;
   };
   prio: Record<Priority, string>;
+  cat: Record<Category, string>;
   meta: {
     min: (n: number) => string;
     due: (d: string) => string;
@@ -38,6 +39,12 @@ export interface Strings {
   };
   progress: (done: number, total: number) => string;
   celebrateText: (n: number) => string;
+  capacity: {
+    label: string;
+    over: string;
+    noEstimate: (n: number) => string;
+    fmt: (min: number) => string;
+  };
 }
 
 const uk: Strings = {
@@ -71,9 +78,29 @@ const uk: Strings = {
     celebrateTitle: "Ти закрив усі задачі на сьогодні!",
   },
   prio: { low: "низький", medium: "середній", high: "високий" },
+  cat: {
+    work: "робота",
+    sport: "спорт",
+    leisure: "дозвілля",
+    family: "сімʼя",
+    chores: "побут",
+    other: "інше",
+  },
   meta: { min: (n) => `${n} хв`, due: (d) => `до ${d}`, setTime: "⏱ час?" },
   progress: (done, total) => `${done} / ${total} виконано`,
   celebrateText: (n) => `${n} ${n === 1 ? "задача" : "задач"} виконано сьогодні. Красуня!`,
+  capacity: {
+    label: "Навантаження дня",
+    over: "Перебір — підріж або перенеси щось на завтра",
+    noEstimate: (n) => `${n} без оцінки часу`,
+    fmt: (min) => {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      if (h && m) return `${h} год ${m} хв`;
+      if (h) return `${h} год`;
+      return `${m} хв`;
+    },
+  },
 };
 
 const en: Strings = {
@@ -107,9 +134,29 @@ const en: Strings = {
     celebrateTitle: "You hit all your tasks for today!",
   },
   prio: { low: "low", medium: "medium", high: "high" },
+  cat: {
+    work: "work",
+    sport: "sport",
+    leisure: "leisure",
+    family: "family",
+    chores: "chores",
+    other: "other",
+  },
   meta: { min: (n) => `${n} min`, due: (d) => `due ${d}`, setTime: "⏱ time?" },
   progress: (done, total) => `${done} / ${total} done`,
   celebrateText: (n) => `${n} ${n === 1 ? "task" : "tasks"} done today. Nice work.`,
+  capacity: {
+    label: "Day load",
+    over: "Overbooked — trim or move something to tomorrow",
+    noEstimate: (n) => `${n} without an estimate`,
+    fmt: (min) => {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      if (h && m) return `${h}h ${m}m`;
+      if (h) return `${h}h`;
+      return `${m}m`;
+    },
+  },
 };
 
 export const dict: Record<Lang, Strings> = { uk, en };
