@@ -25,6 +25,7 @@ export interface Task {
   estimateMin: number | null; // ← AI: орієнтовні хвилини
   deadline: string | null; // ← AI: ISO-дата (YYYY-MM-DD) або null
   status: TaskStatus; // ← правило (не AI)
+  scheduledFor: string | null; // день (YYYY-MM-DD), на який заплановано; null = беклог
   suggested: boolean; // ← AI: рекомендація на сьогодні
   createdAt: number;
 }

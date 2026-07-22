@@ -23,6 +23,7 @@ export interface Strings {
     cta: string;
     add: string;
     badge: string;
+    all: string;
   };
   today: {
     title: string;
@@ -34,7 +35,22 @@ export interface Strings {
     emptyInboxTitle: string;
     emptyInboxText: (n: number) => string;
     emptyInboxCta: string;
+    tomorrow: string;
+    endedTitle: string;
+    endedText: (n: number) => string;
   };
+  welcome: {
+    title: string;
+    subtitle: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    bedtimeLabel: string;
+    earlier: string;
+    later: string;
+    start: string;
+    skip: string;
+  };
+  greeting: (name: string, hour: number) => string;
   prio: Record<Priority, string>;
   cat: Record<Category, string>;
   meta: {
@@ -100,6 +116,7 @@ const uk: Strings = {
     cta: "✍️ Захопити щось",
     add: "+ Сьогодні",
     badge: "✨ Раджу на сьогодні",
+    all: "Всі",
   },
   today: {
     title: "Сьогодні",
@@ -113,6 +130,32 @@ const uk: Strings = {
     emptyInboxText: (n) =>
       `У Вхідних ${n} — жодну не позначено «на сьогодні». AI не вигадує дедлайнів, тож обери сам(а), що робитимеш сьогодні.`,
     emptyInboxCta: "📥 Відкрити Вхідні",
+    tomorrow: "🌙 Завтра",
+    endedTitle: "День завершено",
+    endedText: (n) =>
+      `${n} ${n === 1 ? "задача чекає" : "задач чекають"} на завтра.`,
+  },
+  welcome: {
+    title: "Привіт! Я Ладо",
+    subtitle: "Допоможу спланувати твій день. Познайомимось?",
+    nameLabel: "Як тебе звати?",
+    namePlaceholder: "Твоє імʼя",
+    bedtimeLabel: "О котрій зазвичай лягаєш спати?",
+    earlier: "Раніше",
+    later: "Пізніше",
+    start: "Поїхали",
+    skip: "Пропустити",
+  },
+  greeting: (name, hour) => {
+    const part =
+      hour >= 5 && hour < 12
+        ? "Доброго ранку"
+        : hour >= 12 && hour < 18
+          ? "Доброго дня"
+          : hour >= 18 && hour < 23
+            ? "Доброго вечора"
+            : "Доброї ночі";
+    return name ? `${part}, ${name} 👋` : `${part} 👋`;
   },
   prio: { low: "на десерт", medium: "важливо", high: "критично" },
   cat: {
@@ -192,6 +235,7 @@ const en: Strings = {
     cta: "✍️ Capture something",
     add: "+ Today",
     badge: "✨ Suggested for today",
+    all: "All",
   },
   today: {
     title: "Today",
@@ -205,6 +249,32 @@ const en: Strings = {
     emptyInboxText: (n) =>
       `${n} in Inbox — none marked "for today". The AI doesn't invent deadlines, so pick what you'll do today.`,
     emptyInboxCta: "📥 Open Inbox",
+    tomorrow: "🌙 Tomorrow",
+    endedTitle: "Day ended",
+    endedText: (n) =>
+      `${n} ${n === 1 ? "task is waiting" : "tasks are waiting"} for tomorrow.`,
+  },
+  welcome: {
+    title: "Hi! I'm Lado",
+    subtitle: "I'll help you plan your day. Shall we get to know each other?",
+    nameLabel: "What's your name?",
+    namePlaceholder: "Your name",
+    bedtimeLabel: "When do you usually go to bed?",
+    earlier: "Earlier",
+    later: "Later",
+    start: "Let's go",
+    skip: "Skip",
+  },
+  greeting: (name, hour) => {
+    const part =
+      hour >= 5 && hour < 12
+        ? "Good morning"
+        : hour >= 12 && hour < 18
+          ? "Good afternoon"
+          : hour >= 18 && hour < 23
+            ? "Good evening"
+            : "Good night";
+    return name ? `${part}, ${name} 👋` : `${part} 👋`;
   },
   prio: { low: "nice-to-do", medium: "important", high: "critical" },
   cat: {

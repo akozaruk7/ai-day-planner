@@ -12,12 +12,26 @@ function normCategory(c: unknown): Category {
 
 const TASKS_KEY = "ai-planner:tasks";
 
-function todayISO(): string {
-  // Локальна дата у форматі YYYY-MM-DD (для порівняння з дедлайнами).
-  const d = new Date();
+function isoOf(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${m}-${day}`;
+}
+
+function todayISO(): string {
+  return isoOf(new Date());
+}
+
+function tomorrowISO(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return isoOf(d);
+}
+
+// Чи задача належить «сьогодні» (з урахуванням авто-перекочування прострочених).
+function isOnToday(t: Task, day: string): boolean {
+  if (t.status !== "today" && t.status !== "done") return false;
+  return t.scheduledFor == null || t.scheduledFor <= day;
 }
 
 // Валідна ISO-дата YYYY-MM-DD (модель інколи повертає "" замість null).
@@ -57,8 +71,16 @@ export function useTasks() {
       const raw = localStorage.getItem(TASKS_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Task[];
-        // Міграція: старі задачі без category отримують "other".
-        setTasks(parsed.map((t) => ({ ...t, category: normCategory(t.category) })));
+        // Міграція: старі задачі без category/scheduledFor.
+        const today = todayISO();
+        setTasks(
+          parsed.map((t) => ({
+            ...t,
+            category: normCategory(t.category),
+            scheduledFor:
+              t.scheduledFor ?? (t.status === "inbox" ? null : today),
+          }))
+        );
       }
     } catch {
       // пошкоджені дані — стартуємо з порожнього списку
@@ -89,6 +111,7 @@ export function useTasks() {
         estimateMin: typeof p.estimateMin === "number" ? p.estimateMin : null,
         deadline,
         status,
+        scheduledFor: status === "today" ? todayISO() : null,
         // suggested має сенс лише для тих, що лишились у Inbox
         suggested: status === "inbox" && p.suggested,
         createdAt: now + i,
@@ -113,7 +136,9 @@ export function useTasks() {
   const moveToToday = useCallback((id: string) => {
     setTasks((prev) =>
       prev.map((t) =>
-        t.id === id ? { ...t, status: "today", suggested: false } : t
+        t.id === id
+          ? { ...t, status: "today", scheduledFor: todayISO(), suggested: false }
+          : t
       )
     );
   }, []);
@@ -122,7 +147,7 @@ export function useTasks() {
   const moveToInbox = useCallback((id: string) => {
     setTasks((prev) =>
       prev.map((t) =>
-        t.id === id ? { ...t, status: "inbox" } : t
+        t.id === id ? { ...t, status: "inbox", scheduledFor: null } : t
       )
     );
   }, []);
@@ -144,9 +169,8 @@ export function useTasks() {
   // а незавершені — перенести на завтра (лишити в Today) або в Inbox.
   const endDay = useCallback(
     (carryOver: boolean) => {
-      const todays = tasks.filter(
-        (t) => t.status === "today" || t.status === "done"
-      );
+      const day = todayISO();
+      const todays = tasks.filter((t) => isOnToday(t, day));
       if (todays.length === 0) return;
 
       const record: DayRecord = {
@@ -175,12 +199,17 @@ export function useTasks() {
 
       setTasks((prev) =>
         prev
-          .filter((t) => t.status !== "done") // виконані → лише в історії
-          .map((t) =>
-            t.status === "today"
-              ? { ...t, status: carryOver ? "today" : "inbox" }
-              : t
-          )
+          // виконані сьогоднішні → лише в історії
+          .filter((t) => !(t.status === "done" && isOnToday(t, day)))
+          .map((t) => {
+            if (t.status === "today" && isOnToday(t, day)) {
+              // незавершені: на завтра (нова дата) або назад у Inbox
+              return carryOver
+                ? { ...t, scheduledFor: tomorrowISO() }
+                : { ...t, status: "inbox", scheduledFor: null };
+            }
+            return t;
+          })
       );
     },
     [tasks]
@@ -190,8 +219,10 @@ export function useTasks() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const todayList = tasks.filter(
-    (t) => t.status === "today" || t.status === "done"
+  const day = todayISO();
+  const todayList = tasks.filter((t) => isOnToday(t, day));
+  const tomorrowList = tasks.filter(
+    (t) => t.status === "today" && t.scheduledFor != null && t.scheduledFor > day
   );
 
   return {
@@ -199,6 +230,7 @@ export function useTasks() {
     loaded,
     inbox: tasks.filter((t) => t.status === "inbox"),
     today: todayList,
+    tomorrow: tomorrowList,
     doneCount: todayList.filter((t) => t.status === "done").length,
     addParsed,
     toggleDone,

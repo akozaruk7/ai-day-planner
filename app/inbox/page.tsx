@@ -1,12 +1,42 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useTasks } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
+import { CATEGORIES } from "@/lib/types";
+import type { Category } from "@/lib/types";
+
+type Filter = Category | "all";
 
 export default function InboxPage() {
   const { inbox, loaded, moveToToday, toggleDone, cycleEstimate } = useTasks();
   const { t } = useLang();
+
+  const [filter, setFilter] = useState<Filter>("all");
+
+  // Категорії, що реально присутні у Вхідних (сталий порядок) + лічильники.
+  const present = useMemo(
+    () => CATEGORIES.filter((c) => inbox.some((task) => task.category === c)),
+    [inbox]
+  );
+  const counts = useMemo(() => {
+    const map = {} as Record<Category, number>;
+    for (const task of inbox) {
+      map[task.category] = (map[task.category] ?? 0) + 1;
+    }
+    return map;
+  }, [inbox]);
+
+  // Якщо вибрана категорія зникла зі списку — авто-скидання на «Всі».
+  useEffect(() => {
+    if (filter !== "all" && !present.includes(filter)) {
+      setFilter("all");
+    }
+  }, [present, filter]);
+
+  const visible =
+    filter === "all" ? inbox : inbox.filter((task) => task.category === filter);
 
   return (
     <main className="screen">
@@ -25,53 +55,83 @@ export default function InboxPage() {
           </Link>
         </div>
       ) : (
-        <ul className="task-list">
-          {inbox.map((task) => (
-            <li
-              key={task.id}
-              className={`task task--${task.priority}${task.suggested ? " task--suggested" : ""}`}
-            >
+        <>
+          {inbox.length > 0 && (
+            <div className="inbox-filters">
               <button
                 type="button"
-                className="task__check"
-                onClick={() => toggleDone(task.id)}
-                aria-label="Done"
-              />
-              <div className="task__body">
-                <span className="task__title">{task.title}</span>
-                <span className="task__meta">
-                  <span className={`cat cat--${task.category}`}>
-                    {t.cat[task.category]}
-                  </span>
-                  <span className={`prio prio--${task.priority}`}>
-                    {t.prio[task.priority]}
-                  </span>
-                  <button
-                    type="button"
-                    className="chip-edit"
-                    onClick={() => cycleEstimate(task.id)}
-                    aria-label={t.meta.editTimeHint}
-                    title={t.meta.editTimeHint}
-                  >
-                    {task.estimateMin != null
-                      ? t.meta.min(task.estimateMin)
-                      : t.meta.setTime}
-                  </button>
-                  {task.deadline && <span>{t.meta.due(task.deadline)}</span>}
-                  {task.suggested && <span className="badge">{t.inbox.badge}</span>}
-                </span>
-              </div>
-              <button
-                type="button"
-                className="task__add"
-                onClick={() => moveToToday(task.id)}
-                aria-label={t.inbox.add}
+                className={`filter-chip${filter === "all" ? " filter-chip--active" : ""}`}
+                aria-pressed={filter === "all"}
+                onClick={() => setFilter("all")}
               >
-                {t.inbox.add}
+                {t.inbox.all}
+                <span className="filter-chip__count">{inbox.length}</span>
               </button>
-            </li>
-          ))}
-        </ul>
+              {present.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  className={`filter-chip${filter === c ? " filter-chip--active" : ""}`}
+                  aria-pressed={filter === c}
+                  onClick={() => setFilter(c)}
+                >
+                  {t.cat[c]}
+                  <span className="filter-chip__count">{counts[c]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <ul className="task-list">
+            {visible.map((task) => (
+              <li
+                key={task.id}
+                className={`task task--${task.priority}${task.suggested ? " task--suggested" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="task__check"
+                  onClick={() => toggleDone(task.id)}
+                  aria-label="Done"
+                />
+                <div className="task__body">
+                  <span className="task__title">{task.title}</span>
+                  <span className="task__meta">
+                    <span className={`cat cat--${task.category}`}>
+                      {t.cat[task.category]}
+                    </span>
+                    <span className={`prio prio--${task.priority}`}>
+                      {t.prio[task.priority]}
+                    </span>
+                    <button
+                      type="button"
+                      className="chip-edit"
+                      onClick={() => cycleEstimate(task.id)}
+                      aria-label={t.meta.editTimeHint}
+                      title={t.meta.editTimeHint}
+                    >
+                      {task.estimateMin != null
+                        ? t.meta.min(task.estimateMin)
+                        : t.meta.setTime}
+                    </button>
+                    {task.deadline && <span>{t.meta.due(task.deadline)}</span>}
+                    {task.suggested && (
+                      <span className="badge">{t.inbox.badge}</span>
+                    )}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="task__add"
+                  onClick={() => moveToToday(task.id)}
+                  aria-label={t.inbox.add}
+                >
+                  {t.inbox.add}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </main>
   );

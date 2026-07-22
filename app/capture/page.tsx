@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCaptureDraft, useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
+import { useProfile } from "@/lib/useProfile";
 import Mascot from "@/components/Mascot";
 import type { ParsedTask } from "@/lib/types";
 
@@ -15,10 +16,18 @@ export default function CapturePage() {
   const { addParsed } = useTasks();
   const { bedtimeMin } = useDayBudget();
   const { t, lang } = useLang();
+  const { profile } = useProfile();
   const router = useRouter();
 
   const [phase, setPhase] = useState<Phase>("idle");
   const isEmpty = draft.trim().length === 0;
+
+  // Персональне привітання (лише на клієнті — щоб не було hydration mismatch).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const greeting = mounted
+    ? t.greeting(profile.name, new Date().getHours())
+    : "";
 
   // --- Голосовий ввід (браузерний Web Speech API) ---
   const [micSupported, setMicSupported] = useState(false);
@@ -96,23 +105,10 @@ export default function CapturePage() {
       if (!res.ok) throw new Error(`status ${res.status}`);
 
       const data = (await res.json()) as { tasks: ParsedTask[] };
-      const inboxIds = addParsed(data.tasks ?? []);
+      addParsed(data.tasks ?? []);
       setDraft("");
       setPhase("idle");
-      if (inboxIds.length > 0) {
-        // Є що сортувати → крок тріажу.
-        try {
-          localStorage.setItem(
-            "ai-planner:triage-batch",
-            JSON.stringify(inboxIds)
-          );
-        } catch {
-          // ignore
-        }
-        router.push("/triage");
-      } else {
-        router.push("/today");
-      }
+      router.push("/today"); // одразу показуємо день
     } catch {
       setPhase("error");
     }
@@ -123,6 +119,7 @@ export default function CapturePage() {
       <div className="capture">
         <div className="capture__hello">
           <Mascot state="calm" size={64} />
+          {greeting && <p className="capture__greeting">{greeting}</p>}
           <p className="capture__invite">{t.capture.hintEmpty}</p>
         </div>
         <textarea

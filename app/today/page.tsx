@@ -10,10 +10,12 @@ import { CATEGORIES } from "@/lib/types";
 export default function TodayPage() {
   const {
     today,
+    tomorrow,
     inbox,
     doneCount,
     loaded,
     toggleDone,
+    moveToToday,
     moveToInbox,
     cycleEstimate,
     endDay,
@@ -106,9 +108,19 @@ export default function TodayPage() {
         </div>
       )}
 
-      {/* Порожні стани: є задачі у Вхідних (пояснення) vs зовсім порожньо (онбординг) */}
+      {/* Порожні стани: день завершено (на завтра) → є у Вхідних → зовсім порожньо */}
       {loaded && total === 0 ? (
-        inbox.length > 0 ? (
+        tomorrow.length > 0 ? (
+          <div className="empty">
+            <span className="empty__icon" aria-hidden>
+              <Mascot state="night" size={64} />
+            </span>
+            <span className="empty__title">{t.today.endedTitle}</span>
+            <span className="empty__text">
+              {t.today.endedText(tomorrow.length)}
+            </span>
+          </div>
+        ) : inbox.length > 0 ? (
           <div className="empty">
             <span className="empty__icon" aria-hidden>
               <Mascot state="thinking" size={64} />
@@ -229,6 +241,9 @@ export default function TodayPage() {
                       {task.title}
                     </span>
                     <span className="task__meta">
+                      <span className={`cat cat--${task.category}`}>
+                        {t.cat[task.category]}
+                      </span>
                       <span className={`prio prio--${task.priority}`}>
                         {t.prio[task.priority]}
                       </span>
@@ -268,6 +283,37 @@ export default function TodayPage() {
             {t.endDay.button}
           </button>
         </>
+      )}
+
+      {tomorrow.length > 0 && (
+        <section className="tomorrow">
+          <h2 className="tomorrow__title">{t.today.tomorrow}</h2>
+          <ul className="task-list">
+            {tomorrow.map((task) => (
+              <li key={task.id} className={`task task--${task.priority}`}>
+                <div className="task__body">
+                  <span className="task__title">{task.title}</span>
+                  <span className="task__meta">
+                    <span className={`cat cat--${task.category}`}>
+                      {t.cat[task.category]}
+                    </span>
+                    <span className={`prio prio--${task.priority}`}>
+                      {t.prio[task.priority]}
+                    </span>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="task__add"
+                  onClick={() => moveToToday(task.id)}
+                  aria-label={t.inbox.add}
+                >
+                  {t.inbox.add}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {ending && (
