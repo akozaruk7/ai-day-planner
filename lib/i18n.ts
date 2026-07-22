@@ -73,6 +73,7 @@ export interface Strings {
   greeting: (name: string, hour: number) => string;
   tour: {
     skip: string;
+    back: string;
     next: string;
     done: string;
     slides: { title: string; text: string }[];
@@ -194,24 +195,29 @@ const uk: Strings = {
   },
   tour: {
     skip: "Пропустити",
+    back: "Назад",
     next: "Далі",
     done: "Готово",
     slides: [
       {
-        title: "Вивали все з голови",
+        title: "Звільни голову від думок",
         text: "Надиктуй 🎤 або напиши всі задачі — Ладо їх розбере.",
       },
       {
-        title: "AI розкладе по поличках",
-        text: "Пріоритет, категорія, час. Найважливіше одразу піде в «Сьогодні».",
+        title: "Ладо розкладе по поличках",
+        text: "Він сам визначить пріоритет, категорію та час. Найкритичніше одразу потрапить у твій план на «Сьогодні».",
       },
       {
-        title: "Твій день",
-        text: "«Сьогодні» — твій план. Тап міняє час, пріоритет і дату. Заверши день, коли готова.",
+        title: "Твій чіткий план",
+        text: "У вкладці «Сьогодні» — лише те, що треба зробити зараз. Налаштовуй час чи дату в один тап і завершуй день, коли все готово.",
       },
       {
         title: "Усі задачі",
-        text: "Беклог із фільтрами. Щоранку сам підтягує важливе у твій день.",
+        text: "Беклог із фільтрами. Щоранку Ладо сам підтягує важливе у твій день.",
+      },
+      {
+        title: "Додавай, коли захочеш",
+        text: "З «Усіх задач» тапни «+ Сьогодні» — і задача одразу у плані на день.",
       },
     ],
   },
@@ -355,24 +361,29 @@ const en: Strings = {
   },
   tour: {
     skip: "Skip",
+    back: "Back",
     next: "Next",
     done: "Done",
     slides: [
       {
-        title: "Dump everything",
+        title: "Free your mind",
         text: "Say 🎤 or type all your tasks — Lado will sort them out.",
       },
       {
-        title: "AI sorts it out",
-        text: "Priority, category, time. The most important go straight to Today.",
+        title: "Lado sorts it out",
+        text: "It sets priority, category and time. The most critical goes straight to your Today plan.",
       },
       {
-        title: "Your day",
-        text: "Today is your plan. Tap to change time, priority and date. End the day when you're done.",
+        title: "Your clear plan",
+        text: "Today shows only what to do now. Adjust time or date in one tap and end the day when everything's done.",
       },
       {
         title: "All tasks",
-        text: "A backlog with filters. Every morning it pulls the important ones into your day.",
+        text: "A backlog with filters. Every morning Lado pulls the important ones into your day.",
+      },
+      {
+        title: "Add whenever you want",
+        text: "From All tasks, tap «+ Today» — and it's in your day's plan right away.",
       },
     ],
   },

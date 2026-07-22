@@ -6,7 +6,7 @@ import { useProfile } from "@/lib/useProfile";
 import { useLang } from "@/lib/LanguageContext";
 import Mascot from "@/components/Mascot";
 
-const MASCOT_STATES = ["calm", "thinking", "happy", "calm"] as const;
+const MASCOT_STATES = ["calm", "thinking", "happy", "calm", "happy"] as const;
 
 export default function TourPage() {
   const { save } = useProfile();
@@ -26,6 +26,10 @@ export default function TourPage() {
   function next() {
     if (last) finish();
     else setI((n) => n + 1);
+  }
+
+  function back() {
+    setI((n) => Math.max(0, n - 1));
   }
 
   return (
@@ -53,6 +57,11 @@ export default function TourPage() {
         <button type="button" className="tour__next" onClick={next}>
           {last ? t.tour.done : t.tour.next}
         </button>
+        {i > 0 && (
+          <button type="button" className="tour__back" onClick={back}>
+            {t.tour.back}
+          </button>
+        )}
       </div>
     </main>
   );
