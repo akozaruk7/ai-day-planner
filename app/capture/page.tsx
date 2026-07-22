@@ -7,6 +7,7 @@ import { useCaptureDraft, useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
 import { useProfile } from "@/lib/useProfile";
 import Mascot from "@/components/Mascot";
+import Icon from "@/components/Icon";
 import type { ParsedTask } from "@/lib/types";
 
 type Phase = "idle" | "loading" | "error";
@@ -166,7 +167,7 @@ export default function CapturePage() {
               disabled={phase === "loading"}
               aria-label={listening ? t.capture.listening : t.capture.mic}
             >
-              🎤
+              <Icon name="mic" size={68} />
             </button>
             {(listening || !isEmpty) && (
               <span className="mic__hint">

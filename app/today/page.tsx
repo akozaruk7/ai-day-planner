@@ -6,6 +6,7 @@ import { useTasks, useDayBudget } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
 import Mascot from "@/components/Mascot";
 import { CATEGORIES } from "@/lib/types";
+import type { Category } from "@/lib/types";
 
 export default function TodayPage() {
   const {
@@ -63,6 +64,21 @@ export default function TodayPage() {
     (a, b) => prioWeight[b.priority] - prioWeight[a.priority]
   );
 
+  // Фільтр за категорією (лише присутні категорії, як у «Усіх задачах»).
+  const presentCats = CATEGORIES.filter((c) =>
+    today.some((tk) => tk.category === c)
+  );
+  const [filter, setFilter] = useState<Category | "all">("all");
+  useEffect(() => {
+    if (filter !== "all" && !presentCats.includes(filter)) setFilter("all");
+  }, [presentCats, filter]);
+  const catCount = (c: Category) =>
+    today.filter((tk) => tk.category === c).length;
+  const visibleToday =
+    filter === "all"
+      ? sortedToday
+      : sortedToday.filter((tk) => tk.category === filter);
+
   const total = today.length;
   const allDone = total > 0 && doneCount === total;
   const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100);
@@ -80,8 +96,6 @@ export default function TodayPage() {
     Math.min(windowMin, planEndMin - Math.max(nowMin, planStartMin))
   );
   const over = plannedMin > availableMin;
-  const loadPct =
-    availableMin > 0 ? Math.min(100, Math.round((plannedMin / availableMin) * 100)) : 0;
   const endLabel = `${String(Math.floor(planEndMin / 60)).padStart(2, "0")}:${String(
     planEndMin % 60
   ).padStart(2, "0")}`;
@@ -170,10 +184,17 @@ export default function TodayPage() {
                 </span>
               </div>
               <div className="capacity__bar">
-                <div
-                  className="capacity__fill"
-                  style={{ width: `${loadPct}%` }}
-                />
+                {breakdown.map((c) => (
+                  <span
+                    key={c}
+                    className={`capacity__seg cat--${c}`}
+                    style={{
+                      width: `${
+                        availableMin > 0 ? (byCat[c] / availableMin) * 100 : 0
+                      }%`,
+                    }}
+                  />
+                ))}
               </div>
               {breakdown.length > 0 && (
                 <div className="capacity__breakdown">
@@ -224,8 +245,34 @@ export default function TodayPage() {
             </div>
           )}
 
+          {presentCats.length > 1 && (
+            <div className="inbox-filters">
+              <button
+                type="button"
+                className={`filter-chip${filter === "all" ? " filter-chip--active" : ""}`}
+                aria-pressed={filter === "all"}
+                onClick={() => setFilter("all")}
+              >
+                {t.inbox.all}
+                <span className="filter-chip__count">{today.length}</span>
+              </button>
+              {presentCats.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  className={`filter-chip${filter === c ? " filter-chip--active" : ""}`}
+                  aria-pressed={filter === c}
+                  onClick={() => setFilter(c)}
+                >
+                  {t.cat[c]}
+                  <span className="filter-chip__count">{catCount(c)}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           <ul className="task-list">
-            {sortedToday.map((task) => {
+            {visibleToday.map((task) => {
               const done = task.status === "done";
               return (
                 <li key={task.id} className={`task task--${task.priority}`}>

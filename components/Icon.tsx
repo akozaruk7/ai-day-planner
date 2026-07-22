@@ -2,7 +2,7 @@
 // Стиль: stroke=currentColor, fill=none, округлі кінці — «олівцевий» вигляд.
 // Колір успадковується від батька (currentColor), тож активна вкладка підсвічується як є.
 
-type IconName = "capture" | "inbox" | "today" | "history";
+type IconName = "capture" | "inbox" | "today" | "history" | "mic";
 
 export default function Icon({
   name,
@@ -49,6 +49,15 @@ export default function Icon({
         <svg {...common}>
           <circle cx="12" cy="12" r="8" />
           <path d="M12 8v4l3 2" />
+        </svg>
+      );
+    case "mic":
+      return (
+        <svg {...common}>
+          <rect x="9" y="2.5" width="6" height="11" rx="3" />
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+          <path d="M12 17.5V21" />
+          <path d="M8.5 21h7" />
         </svg>
       );
   }

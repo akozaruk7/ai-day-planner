@@ -183,9 +183,9 @@ button {
 }
 
 .capture__input {
-  flex: 2 1 0;
+  flex: 1 1 0;
   width: 100%;
-  min-height: 140px;
+  min-height: 120px;
   resize: none;
   border: none;
   outline: none;
@@ -402,6 +402,31 @@ button {
   border-radius: 999px;
   background: var(--bg);
   overflow: hidden;
+  display: flex;
+}
+
+/* Мультиколор-сегменти навантаження — по категоріях (солідні кольори) */
+.capacity__seg {
+  height: 100%;
+  flex-shrink: 0;
+}
+.capacity__seg.cat--work {
+  background: #4f46e5;
+}
+.capacity__seg.cat--sport {
+  background: #059669;
+}
+.capacity__seg.cat--leisure {
+  background: #0891b2;
+}
+.capacity__seg.cat--family {
+  background: #db2777;
+}
+.capacity__seg.cat--chores {
+  background: #64748b;
+}
+.capacity__seg.cat--other {
+  background: var(--text-muted);
 }
 
 .capacity__fill {
