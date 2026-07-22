@@ -11,8 +11,15 @@ import type { Category } from "@/lib/types";
 type Filter = Category | "all";
 
 export default function InboxPage() {
-  const { inbox, loaded, moveToToday, toggleDone, cycleEstimate, setDeadline } =
-    useTasks();
+  const {
+    inbox,
+    loaded,
+    moveToToday,
+    toggleDone,
+    cycleEstimate,
+    setDeadline,
+    cyclePriority,
+  } = useTasks();
   const { t } = useLang();
 
   const [filter, setFilter] = useState<Filter>("all");
@@ -101,9 +108,15 @@ export default function InboxPage() {
                     <span className={`cat cat--${task.category}`}>
                       {t.cat[task.category]}
                     </span>
-                    <span className={`prio prio--${task.priority}`}>
+                    <button
+                      type="button"
+                      className={`prio prio--${task.priority}`}
+                      onClick={() => cyclePriority(task.id)}
+                      aria-label={t.meta.editPrioHint}
+                      title={t.meta.editPrioHint}
+                    >
                       {t.prio[task.priority]}
-                    </span>
+                    </button>
                     <button
                       type="button"
                       className="chip-edit"

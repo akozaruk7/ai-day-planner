@@ -291,6 +291,18 @@ export function useTasks() {
     );
   }, []);
 
+  // Тап по пріоритету циклює: При нагоді → Важливо → Палає → …
+  const cyclePriority = useCallback((id: string) => {
+    const order: Priority[] = ["low", "medium", "high"];
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== id) return t;
+        const i = order.indexOf(t.priority);
+        return { ...t, priority: order[(i + 1) % order.length] };
+      })
+    );
+  }, []);
+
   // Тап по естімейту циклює кошики: null → 5 → 15 → 30 → 60 → 120 → null.
   const cycleEstimate = useCallback((id: string) => {
     const buckets: (number | null)[] = [null, 5, 15, 30, 60, 120];
@@ -378,6 +390,7 @@ export function useTasks() {
     moveToInbox,
     cycleEstimate,
     setDeadline,
+    cyclePriority,
     endDay,
     removeTask,
   };

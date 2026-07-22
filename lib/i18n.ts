@@ -79,6 +79,7 @@ export interface Strings {
     setTime: string;
     editTimeHint: string;
     dueEdit: string;
+    editPrioHint: string;
   };
   progress: (done: number, total: number) => string;
   celebrateText: (n: number) => string;
@@ -200,6 +201,7 @@ const uk: Strings = {
     setTime: "⏱ час?",
     editTimeHint: "Натисни, щоб змінити час",
     dueEdit: "Змінити дедлайн",
+    editPrioHint: "Натисни, щоб змінити пріоритет",
   },
   progress: (done, total) => `${done} / ${total} виконано`,
   celebrateText: () => "Молодець, так тримати!",
@@ -337,6 +339,7 @@ const en: Strings = {
     setTime: "⏱ time?",
     editTimeHint: "Tap to change time",
     dueEdit: "Change deadline",
+    editPrioHint: "Tap to change priority",
   },
   progress: (done, total) => `${done} / ${total} done`,
   celebrateText: () => "Well done — keep it up!",
