@@ -281,6 +281,7 @@ button {
   font-size: 60px;
   line-height: 1;
   box-shadow: 3px 5px 0 var(--line);
+  animation: mic-breathe 2.6s ease-in-out infinite;
 }
 
 .mic-btn:active {
@@ -301,6 +302,19 @@ button {
   }
   50% {
     opacity: 0.6;
+  }
+}
+
+/* Мʼяке «дихання» кнопки мікрофона в спокої — запрошує натиснути */
+@keyframes mic-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 3px 5px 0 var(--line);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 3px 8px 0 var(--line);
   }
 }
 
@@ -1093,7 +1107,7 @@ button {
 }
 @media (prefers-reduced-motion: reduce) {
   .mascot,
-  .mic-btn--on {
+  .mic-btn {
     animation: none !important;
   }
 }
