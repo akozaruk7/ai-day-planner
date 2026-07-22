@@ -138,6 +138,25 @@ export default function CapturePage() {
           aria-label={t.capture.placeholder}
         />
 
+        {micSupported && (
+          <div className="capture__voice">
+            <button
+              type="button"
+              className={`mic-btn${listening ? " mic-btn--on" : ""}`}
+              onClick={toggleMic}
+              disabled={phase === "loading"}
+              aria-label={listening ? t.capture.listening : t.capture.mic}
+            >
+              🎤
+            </button>
+            {(listening || !isEmpty) && (
+              <span className="mic__hint">
+                {listening ? t.capture.listening : t.capture.hintFilled}
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="capture__actions">
           {phase === "error" && (
             <div className="banner banner--error" role="alert">
@@ -150,23 +169,6 @@ export default function CapturePage() {
                 {t.capture.retry}
               </button>
             </div>
-          )}
-
-          {micSupported && (
-            <button
-              type="button"
-              className={`mic-btn${listening ? " mic-btn--on" : ""}`}
-              onClick={toggleMic}
-              disabled={phase === "loading"}
-              aria-label={listening ? t.capture.listening : t.capture.mic}
-            >
-              🎤
-            </button>
-          )}
-          {(listening || !isEmpty) && (
-            <span className="mic__hint">
-              {listening ? t.capture.listening : t.capture.hintFilled}
-            </span>
           )}
 
           <button

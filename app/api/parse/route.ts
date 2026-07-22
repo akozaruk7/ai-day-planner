@@ -69,6 +69,27 @@ PRIORITIZATION PRINCIPLE (apply in this order):
 Ignore vague musings that aren't tasks. If the dump contains no real tasks, return an empty array.`;
 }
 
+// Чи згадує текст хоч якусь дату/час — щоб у коді відкидати вигадані дедлайни.
+function mentionsDate(text: string): boolean {
+  const t = text.toLowerCase();
+  if (/\d{4}-\d{2}-\d{2}|\b\d{1,2}[./]\d{1,2}\b/.test(t)) return true;
+  if (/\b\d{1,2}\s*(дн(і|ів|я)|день|тижн|week|days?|month|місяц)/.test(t))
+    return true;
+  if (
+    /сьогодн|завтра|післязавтра|позавтра|наступн|цьому тижн|цього тижн|вихідн|понеділ|вівтор|серед[ау]|четвер|п.?ятниц|субот|неділ|дедлайн|термін/.test(
+      t
+    )
+  )
+    return true;
+  if (
+    /today|tomorrow|tonight|next\s+(week|month|day)|deadline|\bdue\b|monday|tuesday|wednesday|thursday|friday|saturday|sunday|january|february|march|april|june|july|august|september|october|november|december/.test(
+      t
+    )
+  )
+    return true;
+  return false;
+}
+
 export async function POST(req: Request) {
   let text = "";
   let outputLang = "Ukrainian";
@@ -120,7 +141,14 @@ export async function POST(req: Request) {
     }
 
     const input = toolUse.input as { tasks?: unknown };
-    const tasks = Array.isArray(input.tasks) ? input.tasks : [];
+    const rawTasks = Array.isArray(input.tasks) ? input.tasks : [];
+    // Захист у коді: якщо в тексті немає жодної згадки дати — відкидаємо
+    // будь-які дедлайни (модель інколи додає їх усупереч інструкції).
+    const tasks = mentionsDate(text)
+      ? rawTasks
+      : rawTasks.map((t) =>
+          t && typeof t === "object" ? { ...(t as object), deadline: null } : t
+        );
     return NextResponse.json({ tasks });
   } catch (err) {
     console.error("parse route error:", err);

@@ -183,9 +183,9 @@ button {
 }
 
 .capture__input {
-  flex: 1;
+  flex: 2 1 0;
   width: 100%;
-  min-height: 200px;
+  min-height: 140px;
   resize: none;
   border: none;
   outline: none;
@@ -204,6 +204,16 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 12px;
+}
+
+/* Зона голосового вводу — мікрофон по центру між текстом і кнопкою */
+.capture__voice {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 12px;
 }
 
@@ -256,8 +266,8 @@ button {
 
 /* Кнопка голосового вводу */
 .mic-btn {
-  width: 88px;
-  height: 88px;
+  width: 116px;
+  height: 116px;
   align-self: center;
   display: flex;
   align-items: center;
@@ -266,9 +276,9 @@ button {
   border-radius: 50%;
   background: var(--panel);
   color: var(--ink);
-  font-size: 38px;
+  font-size: 48px;
   line-height: 1;
-  box-shadow: 3px 4px 0 var(--line);
+  box-shadow: 3px 5px 0 var(--line);
 }
 
 .mic-btn:active {
@@ -695,6 +705,23 @@ button {
 .chip-edit:active {
   background: var(--surface);
   border-style: solid;
+}
+
+/* Редагований дедлайн (нативний date-input у вигляді чипа) */
+.chip-date {
+  min-height: 30px;
+  padding: 3px 8px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--f-body);
+  font-size: 12px;
+  max-width: 150px;
+}
+.chip-date--set {
+  border-style: solid;
+  color: var(--text);
 }
 
 /* Hover-підказка про редагування (десктоп) */

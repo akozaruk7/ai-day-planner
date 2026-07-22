@@ -74,6 +74,7 @@ export interface Strings {
     due: (d: string) => string;
     setTime: string;
     editTimeHint: string;
+    dueEdit: string;
   };
   progress: (done: number, total: number) => string;
   celebrateText: (n: number) => string;
@@ -111,7 +112,7 @@ export interface Strings {
 }
 
 const uk: Strings = {
-  tab: { capture: "Захопити", inbox: "Усі задачі", today: "Сьогодні" },
+  tab: { capture: "Запланувати", inbox: "Усі задачі", today: "Сьогодні" },
   capture: {
     placeholder: "Купити молока, подзвонити мамі, доробити презентацію…",
     sort: "✨ Перетворити на задачі",
@@ -141,7 +142,7 @@ const uk: Strings = {
     emptyText: "Поки що нічого не заплановано.",
     cta: "+ Додати задачі",
     viewAll: "Переглянути Усі задачі",
-    celebrateTitle: "Ти закрив усі задачі на сьогодні!",
+    celebrateTitle: "Всі задачі на сьогодні завершено!",
     emptyInboxTitle: "Нічого на сьогодні",
     emptyInboxText: (n) =>
       `В Усіх задачах ${n} задач, але жодну ще не позначено «на сьогодні». AI не вигадує дедлайнів, тож обери сам(а), що робитимеш сьогодні.`,
@@ -190,9 +191,10 @@ const uk: Strings = {
     due: (d) => `до ${d}`,
     setTime: "⏱ час?",
     editTimeHint: "Натисни, щоб змінити час",
+    dueEdit: "Змінити дедлайн",
   },
   progress: (done, total) => `${done} / ${total} виконано`,
-  celebrateText: (n) => `${n} ${n === 1 ? "задача" : "задач"} виконано сьогодні. Красуня!`,
+  celebrateText: () => "Молодець, так тримати!",
   capacity: {
     label: "Навантаження дня",
     over: "Перебір — підріж або перенеси щось на завтра",
@@ -209,7 +211,18 @@ const uk: Strings = {
     button: "Завершити день",
     title: "Підсумок дня",
     done: (d, total) => `Виконано ${d} з ${total}`,
-    unfinishedQ: (n) => `${n} незавершених — що з ними?`,
+    unfinishedQ: (n) => {
+      const m10 = n % 10;
+      const m100 = n % 100;
+      const one = m10 === 1 && m100 !== 11;
+      const few = m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14);
+      const word = one
+        ? "незавершена задача"
+        : few
+          ? "незавершені задачі"
+          : "незавершених задач";
+      return `${n} ${word} — що з ${one ? "нею" : "ними"}?`;
+    },
     carry: "Перенести на завтра",
     toInbox: "Повернути в Усі задачі",
     allDone: "Усе виконано! 🎉",
@@ -233,7 +246,7 @@ const uk: Strings = {
 };
 
 const en: Strings = {
-  tab: { capture: "Capture", inbox: "All tasks", today: "Today" },
+  tab: { capture: "Plan", inbox: "All tasks", today: "Today" },
   capture: {
     placeholder: "Buy milk, call mom, finish the deck…",
     sort: "✨ Turn into tasks",
@@ -263,7 +276,7 @@ const en: Strings = {
     emptyText: "Nothing planned yet.",
     cta: "+ Add tasks",
     viewAll: "View All tasks",
-    celebrateTitle: "You hit all your tasks for today!",
+    celebrateTitle: "All today's tasks are done!",
     emptyInboxTitle: "Nothing for today",
     emptyInboxText: (n) =>
       `${n} in All tasks, but none is marked "for today" yet. The AI doesn't invent deadlines, so pick what you'll do today.`,
@@ -311,9 +324,10 @@ const en: Strings = {
     due: (d) => `due ${d}`,
     setTime: "⏱ time?",
     editTimeHint: "Tap to change time",
+    dueEdit: "Change deadline",
   },
   progress: (done, total) => `${done} / ${total} done`,
-  celebrateText: (n) => `${n} ${n === 1 ? "task" : "tasks"} done today. Nice work.`,
+  celebrateText: () => "Well done — keep it up!",
   capacity: {
     label: "Day load",
     over: "Overbooked — trim or move something to tomorrow",
@@ -330,7 +344,7 @@ const en: Strings = {
     button: "End the day",
     title: "Day summary",
     done: (d, total) => `${d} of ${total} done`,
-    unfinishedQ: (n) => `${n} unfinished — what now?`,
+    unfinishedQ: (n) => `${n} unfinished ${n === 1 ? "task" : "tasks"} — what now?`,
     carry: "Carry to tomorrow",
     toInbox: "Move to All tasks",
     allDone: "All done! 🎉",

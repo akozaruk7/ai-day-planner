@@ -135,6 +135,11 @@ function newId(): string {
   }
 }
 
+// Нормалізована назва для дедупу (регістр/зайві пробіли не враховуємо).
+function normTitle(s: string): string {
+  return s.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
 /**
  * Клієнтський стан задач із persist у localStorage.
  * Єдине джерело правди — бекенду немає.
@@ -199,32 +204,40 @@ export function useTasks() {
     }
   }, [tasks, loaded]);
 
-  // Додати розпарсені AI-задачі (застосовуємо правило статусу тут, у коді).
+  // Додати розпарсені AI-задачі: правило статусу + дедуп проти активних.
   const addParsed = useCallback((parsed: ParsedTask[]) => {
     const now = Date.now();
-    const mapped: Task[] = parsed.map((p, i) => {
-      const deadline = normalizeDeadline(p.deadline);
-      const status = statusFor(
-        deadline,
-        p.isToday === true,
-        p.suggested === true
+    setTasks((prev) => {
+      // Не додаємо задачу, якщо активна (не виконана) з такою ж назвою вже є.
+      const seen = new Set(
+        prev.filter((t) => t.status !== "done").map((t) => normTitle(t.title))
       );
-      return {
-        id: newId(),
-        title: p.title,
-        priority: p.priority,
-        category: normCategory(p.category),
-        estimateMin: typeof p.estimateMin === "number" ? p.estimateMin : null,
-        deadline,
-        status,
-        scheduledFor: status === "today" ? todayISO() : null,
-        suggested: p.suggested === true,
-        createdAt: now + i,
-      };
+      const mapped: Task[] = [];
+      parsed.forEach((p, i) => {
+        const key = normTitle(p.title);
+        if (!key || seen.has(key)) return; // дублікат — пропускаємо
+        seen.add(key);
+        const deadline = normalizeDeadline(p.deadline);
+        const status = statusFor(
+          deadline,
+          p.isToday === true,
+          p.suggested === true
+        );
+        mapped.push({
+          id: newId(),
+          title: p.title,
+          priority: p.priority,
+          category: normCategory(p.category),
+          estimateMin: typeof p.estimateMin === "number" ? p.estimateMin : null,
+          deadline,
+          status,
+          scheduledFor: status === "today" ? todayISO() : null,
+          suggested: p.suggested === true,
+          createdAt: now + i,
+        });
+      });
+      return [...mapped, ...prev];
     });
-    setTasks((prev) => [...mapped, ...prev]);
-    // Повертаємо id тих, що лишились у Вхідних — для екрана тріажу.
-    return mapped.filter((t) => t.status === "inbox").map((t) => t.id);
   }, []);
 
   const toggleDone = useCallback((id: string) => {
@@ -254,6 +267,13 @@ export function useTasks() {
       prev.map((t) =>
         t.id === id ? { ...t, status: "inbox", scheduledFor: null } : t
       )
+    );
+  }, []);
+
+  // Ручне редагування дедлайну (ISO-дата або null, щоб прибрати).
+  const setDeadline = useCallback((id: string, deadline: string | null) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, deadline } : t))
     );
   }, []);
 
@@ -342,6 +362,7 @@ export function useTasks() {
     moveToToday,
     moveToInbox,
     cycleEstimate,
+    setDeadline,
     endDay,
     removeTask,
   };

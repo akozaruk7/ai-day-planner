@@ -11,7 +11,8 @@ import type { Category } from "@/lib/types";
 type Filter = Category | "all";
 
 export default function InboxPage() {
-  const { inbox, loaded, moveToToday, toggleDone, cycleEstimate } = useTasks();
+  const { inbox, loaded, moveToToday, toggleDone, cycleEstimate, setDeadline } =
+    useTasks();
   const { t } = useLang();
 
   const [filter, setFilter] = useState<Filter>("all");
@@ -114,7 +115,16 @@ export default function InboxPage() {
                         ? t.meta.min(task.estimateMin)
                         : t.meta.setTime}
                     </button>
-                    {task.deadline && <span>{t.meta.due(task.deadline)}</span>}
+                    <input
+                      type="date"
+                      className={`chip-date${task.deadline ? " chip-date--set" : ""}`}
+                      value={task.deadline ?? ""}
+                      onChange={(e) =>
+                        setDeadline(task.id, e.target.value || null)
+                      }
+                      aria-label={t.meta.dueEdit}
+                      title={t.meta.dueEdit}
+                    />
                     {task.suggested && (
                       <span className="badge">{t.inbox.badge}</span>
                     )}
