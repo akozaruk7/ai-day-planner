@@ -2,6 +2,19 @@ import type { Category, Priority } from "./types";
 
 export type Lang = "uk" | "en";
 
+// Приблизний кличний відмінок для українських імен (для привітання).
+// Латинські імена й невідомі закінчення лишаємо без змін.
+function vocativeUk(name: string): string {
+  const n = name.trim();
+  if (!n) return n;
+  if (/ія$/.test(n)) return n.slice(0, -1) + "є"; // Анастасія → Анастасіє
+  if (/я$/.test(n)) return n.slice(0, -1) + "ю"; // Настя → Настю
+  if (/а$/.test(n)) return n.slice(0, -1) + "о"; // Оксана → Оксано
+  if (/[йь]$/.test(n)) return n.slice(0, -1) + "ю"; // Андрій → Андрію
+  if (/[бвгґджзклмнпрстфхцчшщ]$/i.test(n)) return n + "е"; // Іван → Іване
+  return n;
+}
+
 export interface Strings {
   tab: { capture: string; inbox: string; today: string };
   capture: {
@@ -31,6 +44,7 @@ export interface Strings {
     emptyTitle: string;
     emptyText: string;
     cta: string;
+    viewAll: string;
     celebrateTitle: string;
     emptyInboxTitle: string;
     emptyInboxText: (n: number) => string;
@@ -44,7 +58,9 @@ export interface Strings {
     subtitle: string;
     nameLabel: string;
     namePlaceholder: string;
-    bedtimeLabel: string;
+    scheduleLabel: string;
+    dayStart: string;
+    dayEnd: string;
     earlier: string;
     later: string;
     start: string;
@@ -95,12 +111,12 @@ export interface Strings {
 }
 
 const uk: Strings = {
-  tab: { capture: "Захопити", inbox: "Вхідні", today: "Сьогодні" },
+  tab: { capture: "Захопити", inbox: "Усі задачі", today: "Сьогодні" },
   capture: {
-    placeholder: "Що в голові?",
-    sort: "✨ Розібрати на задачі",
+    placeholder: "Купити молока, подзвонити мамі, доробити презентацію…",
+    sort: "✨ Перетворити на задачі",
     sorting: "Розбираю на задачі…",
-    hintEmpty: "Вивали все — AI перетворить це на структуровані задачі",
+    hintEmpty: "Перелічи всі задачі, що крутяться в голові",
     hintFilled: "AI розкладе це на задачі з пріоритетом і дедлайнами",
     error: "Не вдалося звʼязатися з AI. Перевір інтернет і спробуй ще раз.",
     retry: "Повторити",
@@ -108,28 +124,28 @@ const uk: Strings = {
     listening: "● Слухаю… (натисни, щоб зупинити)",
   },
   inbox: {
-    title: "Вхідні",
+    title: "Усі задачі",
     subtitle: "Розпарсені задачі, які ще не заплановані",
     emptyTitle: "Поки порожньо",
     emptyText:
-      "Захопи думки на екрані «Захопити» — розпарсені задачі зʼявляться тут.",
-    cta: "✍️ Захопити щось",
+      "Запиши усі задачі на головному екрані, і Ладо збере всі задачі сюди.",
+    cta: "✍️ Записати прямо зараз",
     add: "+ Сьогодні",
     badge: "✨ Раджу на сьогодні",
     all: "Всі",
   },
   today: {
-    title: "Сьогодні",
+    title: "Заплановані задачі на сьогодні",
     subtitle: "Чекліст задач на сьогодні",
     emptyTitle: "Сплануймо твій день",
-    emptyText:
-      "Поки нічого не заплановано. Вивали, що в голові — задачі на сьогодні зʼявляться тут чеклістом.",
-    cta: "✍️ Почати захоплювати",
+    emptyText: "Поки що нічого не заплановано.",
+    cta: "+ Додати задачі",
+    viewAll: "Переглянути Усі задачі",
     celebrateTitle: "Ти закрив усі задачі на сьогодні!",
     emptyInboxTitle: "Нічого на сьогодні",
     emptyInboxText: (n) =>
-      `У Вхідних ${n} — жодну не позначено «на сьогодні». AI не вигадує дедлайнів, тож обери сам(а), що робитимеш сьогодні.`,
-    emptyInboxCta: "📥 Відкрити Вхідні",
+      `В Усіх задачах ${n} задач, але жодну ще не позначено «на сьогодні». AI не вигадує дедлайнів, тож обери сам(а), що робитимеш сьогодні.`,
+    emptyInboxCta: "📥 Відкрити Усі задачі",
     tomorrow: "🌙 Завтра",
     endedTitle: "День завершено",
     endedText: (n) =>
@@ -140,7 +156,9 @@ const uk: Strings = {
     subtitle: "Допоможу спланувати твій день. Познайомимось?",
     nameLabel: "Як тебе звати?",
     namePlaceholder: "Твоє імʼя",
-    bedtimeLabel: "О котрій зазвичай лягаєш спати?",
+    scheduleLabel: "Коли ти плануєш виконувати задачі?",
+    dayStart: "Початок дня",
+    dayEnd: "Кінець дня",
     earlier: "Раніше",
     later: "Пізніше",
     start: "Поїхали",
@@ -155,9 +173,10 @@ const uk: Strings = {
           : hour >= 18 && hour < 23
             ? "Доброго вечора"
             : "Доброї ночі";
-    return name ? `${part}, ${name} 👋` : `${part} 👋`;
+    const voc = vocativeUk(name);
+    return voc ? `${part}, ${voc} 👋` : `${part} 👋`;
   },
-  prio: { low: "на десерт", medium: "важливо", high: "критично" },
+  prio: { low: "При нагоді", medium: "Важливо", high: "Палає 🔥" },
   cat: {
     work: "робота",
     sport: "спорт",
@@ -192,11 +211,11 @@ const uk: Strings = {
     done: (d, total) => `Виконано ${d} з ${total}`,
     unfinishedQ: (n) => `${n} незавершених — що з ними?`,
     carry: "Перенести на завтра",
-    toInbox: "Повернути в Inbox",
+    toInbox: "Повернути в Усі задачі",
     allDone: "Усе виконано! 🎉",
     cancel: "Скасувати",
     toastCarry: (n) => `✓ День завершено. Перенесено на завтра: ${n}.`,
-    toastInbox: (n) => `✓ День завершено. Повернуто в Inbox: ${n}.`,
+    toastInbox: (n) => `✓ День завершено. Повернуто в Усі задачі: ${n}.`,
     toastAllDone: "✓ День завершено. Усе виконано! 🎉",
   },
   history: {
@@ -207,19 +226,19 @@ const uk: Strings = {
   },
   triage: {
     title: "Що на сьогодні?",
-    subtitle: "Обери, що робитимеш сьогодні — решта лишиться у Вхідних.",
+    subtitle: "Обери, що робитимеш сьогодні — решта лишиться в Усіх задачах.",
     add: "+ Сьогодні",
     done: "Готово",
   },
 };
 
 const en: Strings = {
-  tab: { capture: "Capture", inbox: "Inbox", today: "Today" },
+  tab: { capture: "Capture", inbox: "All tasks", today: "Today" },
   capture: {
-    placeholder: "What's on your mind?",
-    sort: "✨ Sort into tasks",
+    placeholder: "Buy milk, call mom, finish the deck…",
+    sort: "✨ Turn into tasks",
     sorting: "Sorting into tasks…",
-    hintEmpty: "Dump everything — AI turns it into structured tasks",
+    hintEmpty: "List all the tasks buzzing in your head",
     hintFilled: "AI will split this into tasks with priority & deadlines",
     error: "Couldn't reach the AI. Check your connection and try again.",
     retry: "Retry",
@@ -227,28 +246,28 @@ const en: Strings = {
     listening: "● Listening… (tap to stop)",
   },
   inbox: {
-    title: "Inbox",
+    title: "All tasks",
     subtitle: "Parsed tasks that aren't scheduled yet",
     emptyTitle: "Nothing here yet",
     emptyText:
-      "Dump your thoughts on the Capture screen — parsed tasks will land here.",
-    cta: "✍️ Capture something",
+      "Jot down all your tasks on the main screen, and Lado will gather them here.",
+    cta: "✍️ Write them down now",
     add: "+ Today",
     badge: "✨ Suggested for today",
     all: "All",
   },
   today: {
-    title: "Today",
+    title: "Planned for today",
     subtitle: "Your checklist for today",
     emptyTitle: "Let's plan your day",
-    emptyText:
-      "Nothing scheduled yet. Dump what's on your mind and your tasks for today will show up here as a checklist.",
-    cta: "✍️ Start capturing",
+    emptyText: "Nothing planned yet.",
+    cta: "+ Add tasks",
+    viewAll: "View All tasks",
     celebrateTitle: "You hit all your tasks for today!",
     emptyInboxTitle: "Nothing for today",
     emptyInboxText: (n) =>
-      `${n} in Inbox — none marked "for today". The AI doesn't invent deadlines, so pick what you'll do today.`,
-    emptyInboxCta: "📥 Open Inbox",
+      `${n} in All tasks, but none is marked "for today" yet. The AI doesn't invent deadlines, so pick what you'll do today.`,
+    emptyInboxCta: "📥 Open All tasks",
     tomorrow: "🌙 Tomorrow",
     endedTitle: "Day ended",
     endedText: (n) =>
@@ -259,7 +278,9 @@ const en: Strings = {
     subtitle: "I'll help you plan your day. Shall we get to know each other?",
     nameLabel: "What's your name?",
     namePlaceholder: "Your name",
-    bedtimeLabel: "When do you usually go to bed?",
+    scheduleLabel: "When do you plan to do tasks?",
+    dayStart: "Day starts",
+    dayEnd: "Day ends",
     earlier: "Earlier",
     later: "Later",
     start: "Let's go",
@@ -311,11 +332,11 @@ const en: Strings = {
     done: (d, total) => `${d} of ${total} done`,
     unfinishedQ: (n) => `${n} unfinished — what now?`,
     carry: "Carry to tomorrow",
-    toInbox: "Move to Inbox",
+    toInbox: "Move to All tasks",
     allDone: "All done! 🎉",
     cancel: "Cancel",
     toastCarry: (n) => `✓ Day ended. Carried to tomorrow: ${n}.`,
-    toastInbox: (n) => `✓ Day ended. Moved to Inbox: ${n}.`,
+    toastInbox: (n) => `✓ Day ended. Moved to All tasks: ${n}.`,
     toastAllDone: "✓ Day ended. All done! 🎉",
   },
   history: {
@@ -326,7 +347,7 @@ const en: Strings = {
   },
   triage: {
     title: "What's for today?",
-    subtitle: "Pick what you'll do today — the rest stays in Inbox.",
+    subtitle: "Pick what you'll do today — the rest stays in All tasks.",
     add: "+ Today",
     done: "Done",
   },

@@ -14,7 +14,7 @@ type Phase = "idle" | "loading" | "error";
 export default function CapturePage() {
   const { draft, setDraft } = useCaptureDraft();
   const { addParsed } = useTasks();
-  const { bedtimeMin } = useDayBudget();
+  const { planStartMin, planEndMin, windowMin } = useDayBudget();
   const { t, lang } = useLang();
   const { profile } = useProfile();
   const router = useRouter();
@@ -94,7 +94,10 @@ export default function CapturePage() {
     // Залишок часу до сну (як на Today) — щоб AI не переобіцяв на сьогодні.
     const now = new Date();
     const nowMin = now.getHours() * 60 + now.getMinutes();
-    const availableMin = Math.max(0, Math.min(16 * 60, bedtimeMin - nowMin));
+    const availableMin = Math.max(
+      0,
+      Math.min(windowMin, planEndMin - Math.max(nowMin, planStartMin))
+    );
     try {
       const res = await fetch("/api/parse", {
         method: "POST",
@@ -155,9 +158,15 @@ export default function CapturePage() {
               className={`mic-btn${listening ? " mic-btn--on" : ""}`}
               onClick={toggleMic}
               disabled={phase === "loading"}
+              aria-label={listening ? t.capture.listening : t.capture.mic}
             >
-              {listening ? t.capture.listening : t.capture.mic}
+              🎤
             </button>
+          )}
+          {(listening || !isEmpty) && (
+            <span className="mic__hint">
+              {listening ? t.capture.listening : t.capture.hintFilled}
+            </span>
           )}
 
           <button
@@ -168,9 +177,6 @@ export default function CapturePage() {
           >
             {phase === "loading" ? t.capture.sorting : t.capture.sort}
           </button>
-          <span className="mic__hint">
-            {isEmpty ? t.capture.hintEmpty : t.capture.hintFilled}
-          </span>
         </div>
       </div>
     </main>

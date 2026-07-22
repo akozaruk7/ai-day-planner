@@ -9,7 +9,14 @@ import Mascot from "@/components/Mascot";
 
 export default function WelcomePage() {
   const { profile, loaded, save } = useProfile();
-  const { bedtimeMin, increase, decrease } = useDayBudget();
+  const {
+    planStartMin,
+    planEndMin,
+    startEarlier,
+    startLater,
+    endEarlier,
+    endLater,
+  } = useDayBudget();
   const { t } = useLang();
   const router = useRouter();
 
@@ -27,10 +34,11 @@ export default function WelcomePage() {
     if (loaded && profile.name) setName(profile.name);
   }, [loaded, profile.name]);
 
-  const bedtimeLabel = `${String(Math.floor(bedtimeMin / 60)).padStart(
-    2,
-    "0"
-  )}:${String(bedtimeMin % 60).padStart(2, "0")}`;
+  const fmt = (m: number) =>
+    `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(
+      2,
+      "0"
+    )}`;
 
   function finish() {
     save({ name: name.trim(), onboarded: true });
@@ -64,23 +72,46 @@ export default function WelcomePage() {
         />
 
         <div className="welcome__field">
-          <span className="welcome__label">{t.welcome.bedtimeLabel}</span>
-          <div className="welcome__stepper">
-            <button
-              type="button"
-              onClick={decrease}
-              aria-label={t.welcome.earlier}
-            >
-              −
-            </button>
-            <span className="welcome__bedtime">🌙 {bedtimeLabel}</span>
-            <button
-              type="button"
-              onClick={increase}
-              aria-label={t.welcome.later}
-            >
-              +
-            </button>
+          <span className="welcome__label">{t.welcome.scheduleLabel}</span>
+          <div className="welcome__row">
+            <span className="welcome__rowlabel">{t.welcome.dayStart}</span>
+            <div className="welcome__stepper">
+              <button
+                type="button"
+                onClick={startEarlier}
+                aria-label={t.welcome.earlier}
+              >
+                −
+              </button>
+              <span className="welcome__bedtime">{fmt(planStartMin)}</span>
+              <button
+                type="button"
+                onClick={startLater}
+                aria-label={t.welcome.later}
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <div className="welcome__row">
+            <span className="welcome__rowlabel">{t.welcome.dayEnd}</span>
+            <div className="welcome__stepper">
+              <button
+                type="button"
+                onClick={endEarlier}
+                aria-label={t.welcome.earlier}
+              >
+                −
+              </button>
+              <span className="welcome__bedtime">{fmt(planEndMin)}</span>
+              <button
+                type="button"
+                onClick={endLater}
+                aria-label={t.welcome.later}
+              >
+                +
+              </button>
+            </div>
           </div>
         </div>
 

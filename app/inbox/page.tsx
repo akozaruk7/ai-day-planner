@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useTasks } from "@/lib/useTasks";
 import { useLang } from "@/lib/LanguageContext";
+import Mascot from "@/components/Mascot";
 import { CATEGORIES } from "@/lib/types";
 import type { Category } from "@/lib/types";
 
@@ -41,12 +42,11 @@ export default function InboxPage() {
   return (
     <main className="screen">
       <h1 className="screen__title">{t.inbox.title}</h1>
-      <p className="screen__subtitle">{t.inbox.subtitle}</p>
 
       {loaded && inbox.length === 0 ? (
         <div className="empty">
           <span className="empty__icon" aria-hidden>
-            📥
+            <Mascot state="thinking" size={64} />
           </span>
           <span className="empty__title">{t.inbox.emptyTitle}</span>
           <span className="empty__text">{t.inbox.emptyText}</span>

@@ -20,7 +20,8 @@ export default function TodayPage() {
     cycleEstimate,
     endDay,
   } = useTasks();
-  const { bedtimeMin, increase, decrease } = useDayBudget();
+  const { planStartMin, planEndMin, windowMin, endEarlier, endLater } =
+    useDayBudget();
   const { t, lang } = useLang();
 
   const [ending, setEnding] = useState(false);
@@ -73,12 +74,15 @@ export default function TodayPage() {
   const nowMin = mounted
     ? new Date().getHours() * 60 + new Date().getMinutes()
     : 0;
-  const availableMin = Math.max(0, Math.min(16 * 60, bedtimeMin - nowMin));
+  const availableMin = Math.max(
+    0,
+    Math.min(windowMin, planEndMin - Math.max(nowMin, planStartMin))
+  );
   const over = plannedMin > availableMin;
   const loadPct =
     availableMin > 0 ? Math.min(100, Math.round((plannedMin / availableMin) * 100)) : 0;
-  const bedtimeLabel = `${String(Math.floor(bedtimeMin / 60)).padStart(2, "0")}:${String(
-    bedtimeMin % 60
+  const endLabel = `${String(Math.floor(planEndMin / 60)).padStart(2, "0")}:${String(
+    planEndMin % 60
   ).padStart(2, "0")}`;
 
   // Розбивка дня по категоріях (лише присутні, у сталому порядку).
@@ -100,8 +104,6 @@ export default function TodayPage() {
           {t.history.link}
         </Link>
       </div>
-      <p className="screen__subtitle">{t.today.subtitle}</p>
-
       {toast && (
         <div className="toast" role="status">
           {toast}
@@ -116,9 +118,6 @@ export default function TodayPage() {
               <Mascot state="night" size={64} />
             </span>
             <span className="empty__title">{t.today.endedTitle}</span>
-            <span className="empty__text">
-              {t.today.endedText(tomorrow.length)}
-            </span>
           </div>
         ) : inbox.length > 0 ? (
           <div className="empty">
@@ -142,6 +141,9 @@ export default function TodayPage() {
             <span className="empty__text">{t.today.emptyText}</span>
             <Link href="/capture" className="cta">
               {t.today.cta}
+            </Link>
+            <Link href="/inbox" className="cta cta--ghost">
+              {t.today.viewAll}
             </Link>
           </div>
         )
@@ -191,18 +193,18 @@ export default function TodayPage() {
                       : ""}
                 </span>
                 <div className="capacity__stepper">
-                  <span className="capacity__bedtime">🌙 {bedtimeLabel}</span>
+                  <span className="capacity__bedtime">🌙 {endLabel}</span>
                   <button
                     type="button"
-                    onClick={decrease}
-                    aria-label="Earlier bedtime"
+                    onClick={endEarlier}
+                    aria-label="Earlier end"
                   >
                     −
                   </button>
                   <button
                     type="button"
-                    onClick={increase}
-                    aria-label="Later bedtime"
+                    onClick={endLater}
+                    aria-label="Later end"
                   >
                     +
                   </button>

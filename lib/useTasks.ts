@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { CATEGORIES } from "./types";
-import type { Category, DayRecord, ParsedTask, Task } from "./types";
+import type { Category, DayRecord, ParsedTask, Priority, Task } from "./types";
 
 const HISTORY_KEY = "ai-planner:history";
 
@@ -11,6 +11,13 @@ function normCategory(c: unknown): Category {
 }
 
 const TASKS_KEY = "ai-planner:tasks";
+const PLAN_START_KEY = "ai-planner:plan-start-min";
+const PLAN_END_KEY = "ai-planner:plan-end-min";
+const DEFAULT_START_MIN = 9 * 60; // 09:00
+const DEFAULT_END_MIN = 22 * 60; // 22:00
+const LAST_PLANNED_KEY = "ai-planner:last-planned-day";
+const APPROACH_DAYS = 2; // дедлайн у межах N днів вважаємо «наближається»
+const DEFAULT_TASK_MIN = 30; // хвилин для задач без оцінки (наповнення дня)
 
 function isoOf(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -34,6 +41,71 @@ function isOnToday(t: Task, day: string): boolean {
   return t.scheduledFor == null || t.scheduledFor <= day;
 }
 
+// ISO-дата через N днів від сьогодні.
+function isoPlusDays(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return isoOf(d);
+}
+
+// Тривалість вікна планування (хв) з localStorage; дефолт — 09:00–22:00.
+function readWindowMin(): number {
+  try {
+    const s = parseInt(localStorage.getItem(PLAN_START_KEY) ?? "", 10);
+    const e = parseInt(localStorage.getItem(PLAN_END_KEY) ?? "", 10);
+    if (Number.isFinite(s) && Number.isFinite(e)) return Math.max(0, e - s);
+  } catch {
+    // ignore
+  }
+  return DEFAULT_END_MIN - DEFAULT_START_MIN;
+}
+
+// Авто-наповнення «Сьогодні» з беклогу: спершу задачі з дедлайном, що
+// наближається, потім — за пріоритетом, поки не заповниться вікно дня.
+function autoPlanFromBacklog(
+  tasks: Task[],
+  windowMin: number,
+  today: string,
+  approachIso: string
+): Task[] {
+  const onToday = (t: Task) =>
+    (t.status === "today" || t.status === "done") &&
+    (t.scheduledFor == null || t.scheduledFor <= today);
+  let usedMin = tasks
+    .filter(onToday)
+    .reduce((sum, t) => sum + (t.estimateMin ?? DEFAULT_TASK_MIN), 0);
+
+  const prioWeight: Record<Priority, number> = { high: 3, medium: 2, low: 1 };
+  const isApproaching = (t: Task) =>
+    t.deadline != null && t.deadline <= approachIso;
+
+  const backlog = tasks
+    .filter((t) => t.status === "inbox")
+    .sort((a, b) => {
+      const ad = isApproaching(a) ? 1 : 0;
+      const bd = isApproaching(b) ? 1 : 0;
+      if (ad !== bd) return bd - ad; // дедлайн наближається — першими
+      return prioWeight[b.priority] - prioWeight[a.priority];
+    });
+
+  const promote = new Set<string>();
+  for (const t of backlog) {
+    const cost = t.estimateMin ?? DEFAULT_TASK_MIN;
+    if (isApproaching(t)) {
+      promote.add(t.id); // дедлайн — беремо завжди
+      usedMin += cost;
+    } else if (usedMin + cost <= windowMin) {
+      promote.add(t.id);
+      usedMin += cost;
+    }
+  }
+
+  if (promote.size === 0) return tasks;
+  return tasks.map((t) =>
+    promote.has(t.id) ? { ...t, status: "today", scheduledFor: today } : t
+  );
+}
+
 // Валідна ISO-дата YYYY-MM-DD (модель інколи повертає "" замість null).
 function isISODate(d: unknown): d is string {
   return typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
@@ -45,9 +117,14 @@ function normalizeDeadline(d: unknown): string | null {
 }
 
 // Правило (не AI): що одразу потрапляє в Today.
-function statusFor(deadline: string | null, isToday: boolean): Task["status"] {
+// Рекомендовані (suggested) також ідуть у Today — авто-додавання.
+function statusFor(
+  deadline: string | null,
+  isToday: boolean,
+  suggested: boolean
+): Task["status"] {
   const isDueToday = deadline !== null && deadline <= todayISO();
-  return isToday || isDueToday ? "today" : "inbox";
+  return isToday || isDueToday || suggested ? "today" : "inbox";
 }
 
 function newId(): string {
@@ -69,19 +146,44 @@ export function useTasks() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(TASKS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Task[];
-        // Міграція: старі задачі без category/scheduledFor.
-        const today = todayISO();
-        setTasks(
-          parsed.map((t) => ({
+      const today = todayISO();
+      // Міграція: старі задачі без category/scheduledFor.
+      let list: Task[] = raw
+        ? (JSON.parse(raw) as Task[]).map((t) => ({
             ...t,
             category: normCategory(t.category),
             scheduledFor:
               t.scheduledFor ?? (t.status === "inbox" ? null : today),
           }))
-        );
+        : [];
+
+      // Авто-наповнення «Сьогодні» з беклогу — один раз на новий день.
+      const lastPlanned = localStorage.getItem(LAST_PLANNED_KEY);
+      if (lastPlanned !== today) {
+        if (list.length > 0) {
+          const planned = autoPlanFromBacklog(
+            list,
+            readWindowMin(),
+            today,
+            isoPlusDays(APPROACH_DAYS)
+          );
+          if (planned !== list) {
+            list = planned;
+            try {
+              localStorage.setItem(TASKS_KEY, JSON.stringify(list));
+            } catch {
+              // ignore
+            }
+          }
+        }
+        try {
+          localStorage.setItem(LAST_PLANNED_KEY, today);
+        } catch {
+          // ignore
+        }
       }
+
+      setTasks(list);
     } catch {
       // пошкоджені дані — стартуємо з порожнього списку
     }
@@ -102,7 +204,11 @@ export function useTasks() {
     const now = Date.now();
     const mapped: Task[] = parsed.map((p, i) => {
       const deadline = normalizeDeadline(p.deadline);
-      const status = statusFor(deadline, p.isToday === true);
+      const status = statusFor(
+        deadline,
+        p.isToday === true,
+        p.suggested === true
+      );
       return {
         id: newId(),
         title: p.title,
@@ -112,8 +218,7 @@ export function useTasks() {
         deadline,
         status,
         scheduledFor: status === "today" ? todayISO() : null,
-        // suggested має сенс лише для тих, що лишились у Inbox
-        suggested: status === "inbox" && p.suggested,
+        suggested: p.suggested === true,
         createdAt: now + i,
       };
     });
@@ -262,46 +367,60 @@ export function useHistory() {
   return { records: sorted, loaded };
 }
 
-const BEDTIME_KEY = "ai-planner:bedtime-min";
-const DEFAULT_BEDTIME_MIN = 23 * 60; // 23:00
-const BEDTIME_STEP = 30;
-const BEDTIME_MIN = 18 * 60; // 18:00
-const BEDTIME_MAX = 24 * 60 - 1; // 23:59
+const PLAN_STEP = 30;
+const EARLIEST_START = 4 * 60; // 04:00
+const LATEST_END = 24 * 60 - 1; // 23:59
 
 /**
- * Час відходу до сну (хвилини від початку доби), persist у localStorage.
- * Доступний час на день рахується як «від зараз до сну» (див. Today).
+ * Графік планування дня — «з якої по яку годину» (хвилини від початку доби),
+ * persist у localStorage. Доступний час = від max(зараз, старт) до кінця дня.
  */
 export function useDayBudget() {
-  const [bedtimeMin, setBedtime] = useState(DEFAULT_BEDTIME_MIN);
+  const [planStartMin, setStartMin] = useState(DEFAULT_START_MIN);
+  const [planEndMin, setEndMin] = useState(DEFAULT_END_MIN);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(BEDTIME_KEY);
-      const n = raw ? parseInt(raw, 10) : NaN;
-      if (Number.isFinite(n)) setBedtime(n);
+      const s = parseInt(localStorage.getItem(PLAN_START_KEY) ?? "", 10);
+      const e = parseInt(localStorage.getItem(PLAN_END_KEY) ?? "", 10);
+      if (Number.isFinite(s)) setStartMin(s);
+      if (Number.isFinite(e)) setEndMin(e);
     } catch {
       // ignore
     }
     setLoaded(true);
   }, []);
 
-  const persist = useCallback((min: number) => {
-    const clamped = Math.min(BEDTIME_MAX, Math.max(BEDTIME_MIN, min));
-    setBedtime(clamped);
+  const saveStart = useCallback((min: number, end: number) => {
+    const clamped = Math.min(end - PLAN_STEP, Math.max(EARLIEST_START, min));
+    setStartMin(clamped);
     try {
-      localStorage.setItem(BEDTIME_KEY, String(clamped));
+      localStorage.setItem(PLAN_START_KEY, String(clamped));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const saveEnd = useCallback((min: number, start: number) => {
+    const clamped = Math.min(LATEST_END, Math.max(start + PLAN_STEP, min));
+    setEndMin(clamped);
+    try {
+      localStorage.setItem(PLAN_END_KEY, String(clamped));
     } catch {
       // ignore
     }
   }, []);
 
   return {
-    bedtimeMin,
+    planStartMin,
+    planEndMin,
+    windowMin: Math.max(0, planEndMin - planStartMin),
     loaded,
-    increase: () => persist(bedtimeMin + BEDTIME_STEP),
-    decrease: () => persist(bedtimeMin - BEDTIME_STEP),
+    startEarlier: () => saveStart(planStartMin - PLAN_STEP, planEndMin),
+    startLater: () => saveStart(planStartMin + PLAN_STEP, planEndMin),
+    endEarlier: () => saveEnd(planEndMin - PLAN_STEP, planStartMin),
+    endLater: () => saveEnd(planEndMin + PLAN_STEP, planStartMin),
   };
 }
 
