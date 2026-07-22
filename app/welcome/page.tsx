@@ -42,12 +42,12 @@ export default function WelcomePage() {
 
   function finish() {
     save({ name: name.trim(), onboarded: true });
-    router.push("/capture");
+    router.push("/tour");
   }
 
   function skip() {
     save({ onboarded: true });
-    router.push("/capture");
+    router.push("/tour");
   }
 
   return (

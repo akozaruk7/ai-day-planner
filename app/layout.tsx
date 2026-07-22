@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import TabBar from "@/components/TabBar";
 import LangToggle from "@/components/LangToggle";
+import HelpLink from "@/components/HelpLink";
 import { LanguageProvider } from "@/lib/LanguageContext";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default function RootLayout({
         <LanguageProvider>
           <div className="app">
             <header className="topbar">
+              <HelpLink />
               <LangToggle />
             </header>
             {children}

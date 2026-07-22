@@ -11,8 +11,10 @@ export default function Home() {
 
   useEffect(() => {
     if (!loaded) return;
-    router.replace(profile.onboarded ? "/capture" : "/welcome");
-  }, [loaded, profile.onboarded, router]);
+    if (!profile.onboarded) router.replace("/welcome");
+    else if (!profile.tourSeen) router.replace("/tour");
+    else router.replace("/capture");
+  }, [loaded, profile.onboarded, profile.tourSeen, router]);
 
   return null;
 }

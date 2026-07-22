@@ -71,6 +71,12 @@ export interface Strings {
     skip: string;
   };
   greeting: (name: string, hour: number) => string;
+  tour: {
+    skip: string;
+    next: string;
+    done: string;
+    slides: { title: string; text: string }[];
+  };
   prio: Record<Priority, string>;
   cat: Record<Category, string>;
   meta: {
@@ -185,6 +191,29 @@ const uk: Strings = {
             : "Доброї ночі";
     const voc = vocativeUk(name);
     return voc ? `${part}, ${voc} 👋` : `${part} 👋`;
+  },
+  tour: {
+    skip: "Пропустити",
+    next: "Далі",
+    done: "Готово",
+    slides: [
+      {
+        title: "Вивали все з голови",
+        text: "Надиктуй 🎤 або напиши всі задачі — Ладо їх розбере.",
+      },
+      {
+        title: "AI розкладе по поличках",
+        text: "Пріоритет, категорія, час. Найважливіше одразу піде в «Сьогодні».",
+      },
+      {
+        title: "Твій день",
+        text: "«Сьогодні» — твій план. Тап міняє час, пріоритет і дату. Заверши день, коли готова.",
+      },
+      {
+        title: "Усі задачі",
+        text: "Беклог із фільтрами. Щоранку сам підтягує важливе у твій день.",
+      },
+    ],
   },
   prio: { low: "При нагоді", medium: "Важливо", high: "Палає 🔥" },
   cat: {
@@ -323,6 +352,29 @@ const en: Strings = {
             ? "Good evening"
             : "Good night";
     return name ? `${part}, ${name} 👋` : `${part} 👋`;
+  },
+  tour: {
+    skip: "Skip",
+    next: "Next",
+    done: "Done",
+    slides: [
+      {
+        title: "Dump everything",
+        text: "Say 🎤 or type all your tasks — Lado will sort them out.",
+      },
+      {
+        title: "AI sorts it out",
+        text: "Priority, category, time. The most important go straight to Today.",
+      },
+      {
+        title: "Your day",
+        text: "Today is your plan. Tap to change time, priority and date. End the day when you're done.",
+      },
+      {
+        title: "All tasks",
+        text: "A backlog with filters. Every morning it pulls the important ones into your day.",
+      },
+    ],
   },
   prio: { low: "nice-to-do", medium: "important", high: "critical" },
   cat: {

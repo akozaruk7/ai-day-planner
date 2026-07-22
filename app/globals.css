@@ -85,6 +85,7 @@ button {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 10px;
   padding: calc(env(safe-area-inset-top, 0px) + 10px) 20px 0;
 }
 
@@ -1268,6 +1269,92 @@ button {
   font-size: 15px;
   font-weight: 600;
   padding: 8px;
+}
+
+/* Кнопка довідки «?» у топбарі */
+.help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--f-round);
+  font-weight: 800;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+/* Тур (навчальний онбординг — слайди) */
+.tour {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 8px 32px;
+}
+.tour__skip {
+  align-self: flex-end;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 4px;
+}
+.tour__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  max-width: 340px;
+}
+.tour__title {
+  font-family: var(--f-round);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 4px 0 0;
+}
+.tour__text {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+.tour__dots {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0;
+}
+.tour__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.tour__dot--on {
+  background: var(--accent);
+}
+.tour__next {
+  width: 100%;
+  max-width: 320px;
+  min-height: 54px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: var(--f-round);
+  font-size: 18px;
+  font-weight: 800;
+}
+.tour__next:active {
+  filter: brightness(0.95);
 }
 
 /* Персональне привітання на Capture */

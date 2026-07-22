@@ -10,7 +10,12 @@ export default function TabBar() {
   const { t } = useLang();
 
   // Онбординг і стартовий редірект — без нижньої навігації.
-  if (pathname === "/welcome" || pathname === "/") return null;
+  if (
+    pathname === "/welcome" ||
+    pathname === "/tour" ||
+    pathname === "/"
+  )
+    return null;
 
   const tabs = [
     { href: "/capture", label: t.tab.capture, icon: "capture" as const },

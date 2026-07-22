@@ -7,9 +7,10 @@ const PROFILE_KEY = "ai-planner:profile";
 export interface Profile {
   name: string;
   onboarded: boolean;
+  tourSeen: boolean;
 }
 
-const EMPTY: Profile = { name: "", onboarded: false };
+const EMPTY: Profile = { name: "", onboarded: false, tourSeen: false };
 
 /**
  * Профіль користувача (імʼя + чи пройдено онбординг), persist у localStorage.
@@ -27,6 +28,7 @@ export function useProfile() {
         setProfile({
           name: typeof parsed.name === "string" ? parsed.name : "",
           onboarded: parsed.onboarded === true,
+          tourSeen: parsed.tourSeen === true,
         });
       }
     } catch {
