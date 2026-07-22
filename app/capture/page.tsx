@@ -13,13 +13,14 @@ type Phase = "idle" | "loading" | "error";
 
 export default function CapturePage() {
   const { draft, setDraft } = useCaptureDraft();
-  const { addParsed } = useTasks();
+  const { addParsed, splitByExisting } = useTasks();
   const { planStartMin, planEndMin, windowMin } = useDayBudget();
   const { t, lang } = useLang();
   const { profile } = useProfile();
   const router = useRouter();
 
   const [phase, setPhase] = useState<Phase>("idle");
+  const [dupPrompt, setDupPrompt] = useState<ParsedTask[]>([]);
   const isEmpty = draft.trim().length === 0;
 
   // Персональне привітання (лише на клієнті — щоб не було hydration mismatch).
@@ -108,13 +109,31 @@ export default function CapturePage() {
       if (!res.ok) throw new Error(`status ${res.status}`);
 
       const data = (await res.json()) as { tasks: ParsedTask[] };
-      addParsed(data.tasks ?? []);
+      const { fresh, dups } = splitByExisting(data.tasks ?? []);
+      addParsed(fresh);
       setDraft("");
       setPhase("idle");
-      router.push("/today"); // одразу показуємо день
+      if (dups.length > 0) {
+        setDupPrompt(dups); // спитати, чи додавати дублікати
+      } else {
+        router.push("/today"); // одразу показуємо день
+      }
     } catch {
       setPhase("error");
     }
+  }
+
+  // Користувач підтвердив додавання дублікатів.
+  function confirmDups() {
+    addParsed(dupPrompt);
+    setDupPrompt([]);
+    router.push("/today");
+  }
+
+  // Користувач вирішив не додавати дублікати.
+  function skipDups() {
+    setDupPrompt([]);
+    router.push("/today");
   }
 
   return (
@@ -181,6 +200,30 @@ export default function CapturePage() {
           </button>
         </div>
       </div>
+
+      {dupPrompt.length > 0 && (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal">
+            <h2 className="modal__title">{t.capture.dupTitle}</h2>
+            <ul className="modal__dups">
+              {dupPrompt.map((p, i) => (
+                <li key={i}>{p.title}</li>
+              ))}
+            </ul>
+            <p className="modal__msg">{t.capture.dupText}</p>
+            <button
+              type="button"
+              className="modal__btn modal__btn--primary"
+              onClick={confirmDups}
+            >
+              {t.capture.dupAdd}
+            </button>
+            <button type="button" className="modal__btn" onClick={skipDups}>
+              {t.capture.dupSkip}
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

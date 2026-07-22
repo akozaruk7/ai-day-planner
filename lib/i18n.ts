@@ -27,6 +27,10 @@ export interface Strings {
     retry: string;
     mic: string;
     listening: string;
+    dupTitle: string;
+    dupText: string;
+    dupAdd: string;
+    dupSkip: string;
   };
   inbox: {
     title: string;
@@ -123,6 +127,10 @@ const uk: Strings = {
     retry: "Повторити",
     mic: "🎤 Диктувати",
     listening: "● Слухаю… (натисни, щоб зупинити)",
+    dupTitle: "Такі задачі вже є",
+    dupText: "Додати їх ще раз?",
+    dupAdd: "Додати все одно",
+    dupSkip: "Пропустити",
   },
   inbox: {
     title: "Усі задачі",
@@ -257,6 +265,10 @@ const en: Strings = {
     retry: "Retry",
     mic: "🎤 Dictate",
     listening: "● Listening… (tap to stop)",
+    dupTitle: "These already exist",
+    dupText: "Add them again?",
+    dupAdd: "Add anyway",
+    dupSkip: "Skip",
   },
   inbox: {
     title: "All tasks",

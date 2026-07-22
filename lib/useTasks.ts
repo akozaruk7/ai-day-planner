@@ -140,6 +140,24 @@ function normTitle(s: string): string {
   return s.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+// Побудувати задачу з розпарсеного AI-елемента (правило статусу — у коді).
+function buildTask(p: ParsedTask, createdAt: number): Task {
+  const deadline = normalizeDeadline(p.deadline);
+  const status = statusFor(deadline, p.isToday === true, p.suggested === true);
+  return {
+    id: newId(),
+    title: p.title,
+    priority: p.priority,
+    category: normCategory(p.category),
+    estimateMin: typeof p.estimateMin === "number" ? p.estimateMin : null,
+    deadline,
+    status,
+    scheduledFor: status === "today" ? todayISO() : null,
+    suggested: p.suggested === true,
+    createdAt,
+  };
+}
+
 /**
  * Клієнтський стан задач із persist у localStorage.
  * Єдине джерело правди — бекенду немає.
@@ -204,41 +222,37 @@ export function useTasks() {
     }
   }, [tasks, loaded]);
 
-  // Додати розпарсені AI-задачі: правило статусу + дедуп проти активних.
+  // Додати розпарсені AI-задачі (усі, без дедупу — рішення про дублі в UI).
   const addParsed = useCallback((parsed: ParsedTask[]) => {
+    if (parsed.length === 0) return;
     const now = Date.now();
-    setTasks((prev) => {
-      // Не додаємо задачу, якщо активна (не виконана) з такою ж назвою вже є.
-      const seen = new Set(
-        prev.filter((t) => t.status !== "done").map((t) => normTitle(t.title))
-      );
-      const mapped: Task[] = [];
-      parsed.forEach((p, i) => {
-        const key = normTitle(p.title);
-        if (!key || seen.has(key)) return; // дублікат — пропускаємо
-        seen.add(key);
-        const deadline = normalizeDeadline(p.deadline);
-        const status = statusFor(
-          deadline,
-          p.isToday === true,
-          p.suggested === true
-        );
-        mapped.push({
-          id: newId(),
-          title: p.title,
-          priority: p.priority,
-          category: normCategory(p.category),
-          estimateMin: typeof p.estimateMin === "number" ? p.estimateMin : null,
-          deadline,
-          status,
-          scheduledFor: status === "today" ? todayISO() : null,
-          suggested: p.suggested === true,
-          createdAt: now + i,
-        });
-      });
-      return [...mapped, ...prev];
-    });
+    const mapped = parsed.map((p, i) => buildTask(p, now + i));
+    setTasks((prev) => [...mapped, ...prev]);
   }, []);
+
+  // Розділити розпарсені на нові та дублікати (активна задача з такою ж
+  // назвою вже існує, або повтор у самому дампі) — щоб спитати користувача.
+  const splitByExisting = useCallback(
+    (parsed: ParsedTask[]) => {
+      const active = new Set(
+        tasks.filter((t) => t.status !== "done").map((t) => normTitle(t.title))
+      );
+      const seen = new Set<string>();
+      const fresh: ParsedTask[] = [];
+      const dups: ParsedTask[] = [];
+      for (const p of parsed) {
+        const key = normTitle(p.title);
+        if (!key) continue;
+        if (active.has(key) || seen.has(key)) dups.push(p);
+        else {
+          seen.add(key);
+          fresh.push(p);
+        }
+      }
+      return { fresh, dups };
+    },
+    [tasks]
+  );
 
   const toggleDone = useCallback((id: string) => {
     setTasks((prev) =>
@@ -358,6 +372,7 @@ export function useTasks() {
     tomorrow: tomorrowList,
     doneCount: todayList.filter((t) => t.status === "done").length,
     addParsed,
+    splitByExisting,
     toggleDone,
     moveToToday,
     moveToInbox,
