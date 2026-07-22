@@ -198,6 +198,7 @@ button {
 
 .capture__input::placeholder {
   color: var(--text-muted);
+  font-size: 15px;
 }
 
 .capture__actions {
@@ -230,7 +231,7 @@ button {
 .capture__invite {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -266,8 +267,8 @@ button {
 
 /* Кнопка голосового вводу */
 .mic-btn {
-  width: 116px;
-  height: 116px;
+  width: 144px;
+  height: 144px;
   align-self: center;
   display: flex;
   align-items: center;
@@ -276,7 +277,7 @@ button {
   border-radius: 50%;
   background: var(--panel);
   color: var(--ink);
-  font-size: 48px;
+  font-size: 60px;
   line-height: 1;
   box-shadow: 3px 5px 0 var(--line);
 }
@@ -1243,8 +1244,9 @@ button {
 /* Персональне привітання на Capture */
 .capture__greeting {
   font-family: var(--f-round);
-  font-size: 20px;
+  font-size: 27px;
   font-weight: 800;
+  line-height: 1.15;
   margin: 4px 0 0;
   color: var(--text);
 }
