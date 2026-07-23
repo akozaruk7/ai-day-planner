@@ -158,6 +158,36 @@ function buildTask(p: ParsedTask, createdAt: number): Task {
   };
 }
 
+// Обʼєднати два записи історії за одну дату в один (дедуп за назвою;
+// «виконано», якщо виконано хоч в одному).
+function mergeDayRecords(a: DayRecord, b: DayRecord): DayRecord {
+  const byTitle = new Map<string, DayRecord["items"][number]>();
+  for (const it of [...a.items, ...b.items]) {
+    const key = normTitle(it.title);
+    const prev = byTitle.get(key);
+    byTitle.set(key, prev ? { ...prev, done: prev.done || it.done } : it);
+  }
+  const items = Array.from(byTitle.values());
+  return {
+    id: a.id,
+    endedAt: Math.max(a.endedAt, b.endedAt),
+    date: a.date,
+    total: items.length,
+    done: items.filter((it) => it.done).length,
+    items,
+  };
+}
+
+// Згорнути всю історію до одного запису на дату (для чищення старих дублів).
+function mergeHistoryByDate(hist: DayRecord[]): DayRecord[] {
+  const byDate = new Map<string, DayRecord>();
+  for (const r of hist) {
+    const prev = byDate.get(r.date);
+    byDate.set(r.date, prev ? mergeDayRecords(prev, r) : r);
+  }
+  return Array.from(byDate.values());
+}
+
 /**
  * Клієнтський стан задач із persist у localStorage.
  * Єдине джерело правди — бекенду немає.
@@ -342,7 +372,9 @@ export function useTasks() {
       try {
         const raw = localStorage.getItem(HISTORY_KEY);
         const hist: DayRecord[] = raw ? JSON.parse(raw) : [];
-        hist.push(record);
+        const idx = hist.findIndex((r) => r.date === record.date);
+        if (idx >= 0) hist[idx] = mergeDayRecords(hist[idx], record);
+        else hist.push(record);
         localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
       } catch {
         // ignore
@@ -404,7 +436,19 @@ export function useHistory() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(HISTORY_KEY);
-      if (raw) setRecords(JSON.parse(raw) as DayRecord[]);
+      if (raw) {
+        const parsed = JSON.parse(raw) as DayRecord[];
+        const merged = mergeHistoryByDate(parsed);
+        setRecords(merged);
+        // Почистити старі дублі за датою у сховищі.
+        if (merged.length !== parsed.length) {
+          try {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(merged));
+          } catch {
+            // ignore
+          }
+        }
+      }
     } catch {
       // ignore
     }
