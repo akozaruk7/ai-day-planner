@@ -866,6 +866,30 @@ button {
   background: var(--surface);
 }
 
+/* Видалити задачу (тап ✕ → «Видалити?» → підтвердження) */
+.task__del {
+  flex-shrink: 0;
+  align-self: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 9px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+}
+.task__del:active {
+  background: var(--surface);
+}
+.task__del--confirm {
+  background: var(--hi-bg);
+  color: var(--hi);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .task__title--done {
   color: var(--text-muted);
   text-decoration: line-through;

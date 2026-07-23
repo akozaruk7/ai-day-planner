@@ -88,6 +88,8 @@ export interface Strings {
     dueEdit: string;
     editPrioHint: string;
     addDeadline: string;
+    remove: string;
+    removeConfirm: string;
   };
   progress: (done: number, total: number) => string;
   celebrateText: (n: number) => string;
@@ -239,6 +241,8 @@ const uk: Strings = {
     dueEdit: "Змінити дедлайн",
     editPrioHint: "Натисни, щоб змінити пріоритет",
     addDeadline: "Додати дедлайн",
+    remove: "Видалити",
+    removeConfirm: "Видалити?",
   },
   progress: (done, total) => `${done} / ${total} виконано`,
   celebrateText: () => "Молодець, так тримати!",
@@ -406,6 +410,8 @@ const en: Strings = {
     dueEdit: "Change deadline",
     editPrioHint: "Tap to change priority",
     addDeadline: "Add deadline",
+    remove: "Delete",
+    removeConfirm: "Delete?",
   },
   progress: (done, total) => `${done} / ${total} done`,
   celebrateText: () => "Well done — keep it up!",

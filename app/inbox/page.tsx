@@ -19,10 +19,25 @@ export default function InboxPage() {
     cycleEstimate,
     setDeadline,
     cyclePriority,
+    removeTask,
   } = useTasks();
   const { t } = useLang();
 
   const [filter, setFilter] = useState<Filter>("all");
+  const [confirmDel, setConfirmDel] = useState<string | null>(null);
+  useEffect(() => {
+    if (!confirmDel) return;
+    const id = setTimeout(() => setConfirmDel(null), 3000);
+    return () => clearTimeout(id);
+  }, [confirmDel]);
+  function askDelete(id: string) {
+    if (confirmDel === id) {
+      removeTask(id);
+      setConfirmDel(null);
+    } else {
+      setConfirmDel(id);
+    }
+  }
 
   // Категорії, що реально присутні у Вхідних (сталий порядок) + лічильники.
   const present = useMemo(
@@ -165,6 +180,19 @@ export default function InboxPage() {
                   aria-label={t.inbox.add}
                 >
                   {t.inbox.add}
+                </button>
+                <button
+                  type="button"
+                  className={`task__del${confirmDel === task.id ? " task__del--confirm" : ""}`}
+                  onClick={() => askDelete(task.id)}
+                  aria-label={
+                    confirmDel === task.id ? t.meta.removeConfirm : t.meta.remove
+                  }
+                  title={
+                    confirmDel === task.id ? t.meta.removeConfirm : t.meta.remove
+                  }
+                >
+                  {confirmDel === task.id ? t.meta.removeConfirm : "✕"}
                 </button>
               </li>
             ))}
