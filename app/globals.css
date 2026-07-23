@@ -276,7 +276,7 @@ button {
   justify-content: center;
   border: 2px solid var(--sketch);
   border-radius: 50%;
-  background: var(--panel);
+  background: var(--accent);
   color: var(--ink);
   font-size: 60px;
   line-height: 1;
