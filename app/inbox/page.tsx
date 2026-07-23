@@ -128,16 +128,31 @@ export default function InboxPage() {
                         ? t.meta.min(task.estimateMin)
                         : t.meta.setTime}
                     </button>
-                    <input
-                      type="date"
-                      className={`chip-date${task.deadline ? " chip-date--set" : ""}`}
-                      value={task.deadline ?? ""}
-                      onChange={(e) =>
-                        setDeadline(task.id, e.target.value || null)
-                      }
-                      aria-label={t.meta.dueEdit}
-                      title={t.meta.dueEdit}
-                    />
+                    {task.deadline ? (
+                      <input
+                        type="date"
+                        className="chip-date chip-date--set"
+                        value={task.deadline}
+                        onChange={(e) =>
+                          setDeadline(task.id, e.target.value || null)
+                        }
+                        aria-label={t.meta.dueEdit}
+                        title={t.meta.dueEdit}
+                      />
+                    ) : (
+                      <label className="chip-date--empty">
+                        📅 {t.meta.addDeadline}
+                        <input
+                          type="date"
+                          className="chip-date__hidden"
+                          value=""
+                          onChange={(e) =>
+                            setDeadline(task.id, e.target.value || null)
+                          }
+                          aria-label={t.meta.addDeadline}
+                        />
+                      </label>
+                    )}
                     {task.suggested && (
                       <span className="badge">{t.inbox.badge}</span>
                     )}
